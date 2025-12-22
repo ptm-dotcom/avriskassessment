@@ -1,5 +1,3 @@
-// FILE 5: tailwind.config.js
-// Save this as tailwind.config.js
 module.exports = {
   content: [
     './pages/**/*.{js,jsx}',
