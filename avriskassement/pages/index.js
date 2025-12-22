@@ -3,14 +3,14 @@ import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export default function AVRiskAssessment() {
   const [scores, setScores] = useState({
-    projectNovelty: 3,
-    technicalComplexity: 3,
-    resourceUtilization: 3,
-    clientSophistication: 3,
-    budgetSize: 3,
-    timeframeConstraint: 3,
-    teamExperience: 3,
-    equipmentAvailability: 3
+    projectNovelty: 1,
+    technicalComplexity: 1,
+    resourceUtilization: 1,
+    clientSophistication: 1,
+    budgetSize: 1,
+    timeframeConstraint: 1,
+    teamExperience: 1,
+    equipmentAvailability: 1
   });
 
   const factors = [
@@ -19,63 +19,63 @@ export default function AVRiskAssessment() {
       label: 'Project Type Familiarity',
       description: 'How familiar is the team with this type of production?',
       scale: [
-        { value: 1, label: 'Routine/Repeated', risk: 'Low' },
-        { value: 2, label: 'Similar to past', risk: 'Low-Med' },
-        { value: 3, label: 'Some new elements', risk: 'Medium' },
-        { value: 4, label: 'Significantly novel', risk: 'Med-High' },
-        { value: 5, label: 'Entirely new territory', risk: 'High' }
+        { value: 0, label: 'Routine/Repeated', risk: 'Low' },
+        { value: 1, label: 'Similar to past', risk: 'Low-Med' },
+        { value: 2, label: 'Some new elements', risk: 'Medium' },
+        { value: 3, label: 'Significantly novel', risk: 'Med-High' },
+        { value: 4, label: 'Entirely new territory', risk: 'High' }
       ],
-      weight: 1.2
+      weight: 1.0
     },
     {
       id: 'technicalComplexity',
       label: 'Technical Complexity',
       description: 'System integration, equipment sophistication, setup complexity',
       scale: [
-        { value: 1, label: 'Simple/Standard', risk: 'Low' },
-        { value: 2, label: 'Moderate complexity', risk: 'Low-Med' },
-        { value: 3, label: 'Complex systems', risk: 'Medium' },
-        { value: 4, label: 'Highly complex', risk: 'Med-High' },
-        { value: 5, label: 'Bleeding edge/Experimental', risk: 'High' }
+        { value: 0, label: 'Simple/Standard', risk: 'Low' },
+        { value: 1, label: 'Moderate complexity', risk: 'Low-Med' },
+        { value: 2, label: 'Complex systems', risk: 'Medium' },
+        { value: 3, label: 'Highly complex', risk: 'Med-High' },
+        { value: 4, label: 'Bleeding edge/Experimental', risk: 'High' }
       ],
-      weight: 1.3
+      weight: 1.0
     },
     {
       id: 'resourceUtilization',
       label: 'Resource Utilization',
       description: 'Percentage of available equipment/crew committed',
       scale: [
-        { value: 1, label: '0% utilization', risk: 'Low' },
-        { value: 2, label: '1-24% utilization', risk: 'Low-Med' },
-        { value: 3, label: '25-49% utilization', risk: 'Medium' },
-        { value: 4, label: '50-74% utilization', risk: 'Med-High' },
-        { value: 5, label: '75%+ utilization', risk: 'High' }
+        { value: 0, label: '0% utilization', risk: 'Low' },
+        { value: 1, label: '1-24% utilization', risk: 'Low-Med' },
+        { value: 2, label: '25-49% utilization', risk: 'Medium' },
+        { value: 3, label: '50-74% utilization', risk: 'Med-High' },
+        { value: 4, label: '75%+ utilization', risk: 'High' }
       ],
-      weight: 1.1
+      weight: 1.0
     },
     {
       id: 'clientSophistication',
       label: 'Client Experience Level',
       description: 'Client familiarity with AV production processes',
       scale: [
-        { value: 1, label: 'Highly experienced', risk: 'Low' },
-        { value: 2, label: 'Experienced', risk: 'Low-Med' },
-        { value: 3, label: 'Moderate experience', risk: 'Medium' },
-        { value: 4, label: 'Limited experience', risk: 'Med-High' },
-        { value: 5, label: 'First-time client', risk: 'High' }
+        { value: 0, label: 'Highly experienced', risk: 'Low' },
+        { value: 1, label: 'Experienced', risk: 'Low-Med' },
+        { value: 2, label: 'Moderate experience', risk: 'Medium' },
+        { value: 3, label: 'Limited experience', risk: 'Med-High' },
+        { value: 4, label: 'First-time client', risk: 'High' }
       ],
-      weight: 0.9
+      weight: 1.0
     },
     {
       id: 'budgetSize',
       label: 'Budget Scale',
       description: 'Project budget relative to typical projects',
       scale: [
-        { value: 1, label: '<$5k', risk: 'Low' },
-        { value: 2, label: '$5k-$10k', risk: 'Low-Med' },
-        { value: 3, label: '$10k-$40k', risk: 'Medium' },
-        { value: 4, label: '$40k-$100k', risk: 'Med-High' },
-        { value: 5, label: '$100k+', risk: 'High' }
+        { value: 0, label: '<$5k', risk: 'Low' },
+        { value: 1, label: '$5k-$10k', risk: 'Low-Med' },
+        { value: 2, label: '$10k-$40k', risk: 'Medium' },
+        { value: 3, label: '$40k-$100k', risk: 'Med-High' },
+        { value: 4, label: '$100k+', risk: 'High' }
       ],
       weight: 1.0
     },
@@ -84,39 +84,39 @@ export default function AVRiskAssessment() {
       label: 'Timeline Pressure',
       description: 'Prep time available vs. required',
       scale: [
-        { value: 1, label: 'Ample time (>2x needed)', risk: 'Low' },
-        { value: 2, label: 'Comfortable (1.5x needed)', risk: 'Low-Med' },
-        { value: 3, label: 'Standard timeline', risk: 'Medium' },
-        { value: 4, label: 'Tight timeline', risk: 'Med-High' },
-        { value: 5, label: 'Rush/Emergency', risk: 'High' }
+        { value: 0, label: 'Ample time (>2x needed)', risk: 'Low' },
+        { value: 1, label: 'Comfortable (1.5x needed)', risk: 'Low-Med' },
+        { value: 2, label: 'Standard timeline', risk: 'Medium' },
+        { value: 3, label: 'Tight timeline', risk: 'Med-High' },
+        { value: 4, label: 'Rush/Emergency', risk: 'High' }
       ],
-      weight: 1.2
+      weight: 1.0
     },
     {
       id: 'teamExperience',
       label: 'Team Capability',
       description: 'Assigned team experience with similar projects',
       scale: [
-        { value: 1, label: 'Expert team', risk: 'Low' },
-        { value: 2, label: 'Experienced team', risk: 'Low-Med' },
-        { value: 3, label: 'Competent team', risk: 'Medium' },
-        { value: 4, label: 'Learning team', risk: 'Med-High' },
-        { value: 5, label: 'Inexperienced team', risk: 'High' }
+        { value: 0, label: 'Expert team', risk: 'Low' },
+        { value: 1, label: 'Experienced team', risk: 'Low-Med' },
+        { value: 2, label: 'Competent team', risk: 'Medium' },
+        { value: 3, label: 'Learning team', risk: 'Med-High' },
+        { value: 4, label: 'Inexperienced team', risk: 'High' }
       ],
-      weight: 1.3
+      weight: 1.0
     },
     {
       id: 'equipmentAvailability',
       label: 'Sub-hire Availability',
       description: 'Access to external equipment/crew if needed',
       scale: [
-        { value: 1, label: 'Multiple vendors available', risk: 'Low' },
-        { value: 2, label: 'Good sub-hire options', risk: 'Low-Med' },
-        { value: 3, label: 'Limited sub-hire options', risk: 'Medium' },
-        { value: 4, label: 'Minimal sub-hire options', risk: 'Med-High' },
-        { value: 5, label: 'No sub-hire available', risk: 'High' }
+        { value: 0, label: 'Multiple vendors available', risk: 'Low' },
+        { value: 1, label: 'Good sub-hire options', risk: 'Low-Med' },
+        { value: 2, label: 'Limited sub-hire options', risk: 'Medium' },
+        { value: 3, label: 'Minimal sub-hire options', risk: 'Med-High' },
+        { value: 4, label: 'No sub-hire available', risk: 'High' }
       ],
-      weight: 1.1
+      weight: 1.0
     }
   ];
 
@@ -134,15 +134,15 @@ export default function AVRiskAssessment() {
 
   const getRiskLevel = (score) => {
     if (score <= 2.0) return { level: 'LOW', color: 'bg-green-100 text-green-800 border-green-300', icon: CheckCircle };
-    if (score <= 3.0) return { level: 'MEDIUM', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: AlertTriangle };
-    if (score <= 4.0) return { level: 'HIGH', color: 'bg-orange-100 text-orange-800 border-orange-300', icon: AlertCircle };
+    if (score < 6.0) return { level: 'MEDIUM', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: AlertTriangle };
+    if (score => 6.0) return { level: 'HIGH', color: 'bg-orange-100 text-orange-800 border-orange-300', icon: AlertCircle };
     return { level: 'CRITICAL', color: 'bg-red-100 text-red-800 border-red-300', icon: AlertCircle };
   };
 
   const getApprovalRequired = (score) => {
-    if (score <= 2.0) return 'Project Manager';
-    if (score <= 3.0) return 'Senior Manager';
-    if (score <= 4.0) return 'Operations Director';
+    if (score <= 2.0) return 'Account Manager';
+    if (score <= 3.0) return 'Delivery Manager';
+    if (score <= 4.0) return 'Operations Manager';
     return 'Executive Approval Required';
   };
 
