@@ -151,48 +151,48 @@ export default function AVRiskAssessment() {
   const RiskIcon = riskData.icon;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">AV Production Risk Assessment</h1>
-        <p className="text-gray-600 mb-6">Evaluate project risk factors to determine approval requirements and mitigation strategies</p>
-        
-        <div className={`border-2 ${riskData.color} rounded-lg p-6 mb-6`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <RiskIcon className="w-12 h-12" />
-              <div>
-                <div className="text-sm font-medium opacity-75">Overall Risk Score</div>
-                <div className="text-4xl font-bold">{riskScore}</div>
-              </div>
+    <div className="max-w-7xl mx-auto p-3 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-lg p-3">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-800">AV Production Risk Assessment</h1>
+            <p className="text-xs text-gray-600">Evaluate project risk factors to determine approval requirements</p>
+          </div>
+          
+          <div className={`border-2 ${riskData.color} rounded-lg p-3 flex items-center gap-3`}>
+            <RiskIcon className="w-8 h-8 flex-shrink-0" />
+            <div>
+              <div className="text-xs opacity-75">Risk Score</div>
+              <div className="text-2xl font-bold">{riskScore}</div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold mb-1">{riskData.level} RISK</div>
-              <div className="text-sm font-medium">Approval: {getApprovalRequired(parseFloat(riskScore))}</div>
+            <div className="text-right border-l-2 pl-3">
+              <div className="text-lg font-bold">{riskData.level}</div>
+              <div className="text-xs">{getApprovalRequired(parseFloat(riskScore))}</div>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-6">
+        <div className="grid grid-cols-2 gap-3 mb-3">
           {factors.map(factor => (
-            <div key={factor.id} className="bg-gray-50 rounded-lg p-4">
-              <div className="mb-3">
-                <h3 className="font-semibold text-gray-800 mb-1">{factor.label}</h3>
-                <p className="text-sm text-gray-600">{factor.description}</p>
+            <div key={factor.id} className="bg-gray-50 rounded-lg p-2">
+              <div className="mb-2">
+                <h3 className="font-semibold text-sm text-gray-800">{factor.label}</h3>
+                <p className="text-xs text-gray-600">{factor.description}</p>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {factor.scale.map(option => (
-                  <label key={option.value} className="flex items-center gap-3 p-2 rounded hover:bg-white cursor-pointer transition-colors">
+                  <label key={option.value} className="flex items-center gap-2 p-1 rounded hover:bg-white cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name={factor.id}
                       value={option.value}
                       checked={scores[factor.id] === option.value}
                       onChange={() => setScores({...scores, [factor.id]: option.value})}
-                      className="w-4 h-4"
+                      className="w-3 h-3 flex-shrink-0"
                     />
-                    <span className="flex-1 text-sm">{option.label}</span>
-                    <span className="text-xs font-medium text-gray-500 min-w-20 text-right">{option.risk} Risk</span>
+                    <span className="flex-1 text-xs">{option.label}</span>
+                    <span className="text-xs font-medium text-gray-500 min-w-16 text-right">{option.risk}</span>
                   </label>
                 ))}
               </div>
@@ -200,12 +200,11 @@ export default function AVRiskAssessment() {
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-semibold text-blue-900 mb-2">Integration with Current RMS</h3>
-          <p className="text-sm text-blue-800">
+        <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="font-semibold text-sm text-blue-900 mb-1">Integration with Current RMS</h3>
+          <p className="text-xs text-blue-800">
             This scoring model can be integrated into Current RMS through custom fields mapped to each risk factor. 
             The calculated risk score can trigger workflow automations for approval routing based on thresholds.
-            Risk scores can be stored against quotes/orders and updated as project details evolve.
           </p>
         </div>
       </div>
