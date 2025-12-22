@@ -1,0 +1,46 @@
+// FILE 3: styles/globals.css
+// Save this as styles/globals.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+// ============================================
+
+// FILE 4: pages/_app.js
+// Save this as pages/_app.js
+import '../styles/globals.css'
+
+export default function App({ Component, pageProps }) {
+  return <Component {...pageProps} />
+}
+
+// ============================================
+
+// FILE 5: tailwind.config.js
+// Save this as tailwind.config.js
+module.exports = {
+  content: [
+    './pages/**/*.{js,jsx}',
+    './components/**/*.{js,jsx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+// ============================================
+
+// FILE 6: postcss.config.js
+// Save this as postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
