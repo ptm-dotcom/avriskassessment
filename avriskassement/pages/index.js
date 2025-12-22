@@ -134,15 +134,15 @@ export default function AVRiskAssessment() {
 
   const getRiskLevel = (score) => {
     if (score <= 24.0) return { level: 'LOW', color: 'bg-green-100 text-green-800 border-green-300', icon: CheckCircle };
-    if (score < 32.0) return { level: 'MEDIUM', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: AlertTriangle };
-    if (score => 127.0) return { level: 'HIGH', color: 'bg-orange-100 text-orange-800 border-orange-300', icon: AlertCircle };
+    if (score <= 32.0) return { level: 'MEDIUM', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: AlertTriangle };
+    if (score <= 127.0) return { level: 'HIGH', color: 'bg-orange-100 text-orange-800 border-orange-300', icon: AlertCircle };
     return { level: 'CRITICAL', color: 'bg-red-100 text-red-800 border-red-300', icon: AlertCircle };
   };
 
   const getApprovalRequired = (score) => {
-    if (score <= 2.0) return 'Account Manager';
-    if (score <= 3.0) return 'Delivery Manager';
-    if (score <= 4.0) return 'Operations Manager';
+    if (score <= 24.0) return 'Account Manager';
+    if (score <= 32.0) return 'Delivery Manager';
+    if (score <= 127.0) return 'Operations Manager';
     return 'Executive Approval Required';
   };
 
