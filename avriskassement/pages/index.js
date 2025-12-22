@@ -1,5 +1,3 @@
-// FILE 2: pages/index.js
-// Save this as pages/index.js
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
