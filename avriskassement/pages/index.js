@@ -3,14 +3,14 @@ import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export default function AVRiskAssessment() {
   const [scores, setScores] = useState({
-    projectNovelty: 1,
-    technicalComplexity: 1,
-    resourceUtilization: 1,
-    clientSophistication: 1,
-    budgetSize: 1,
-    timeframeConstraint: 1,
-    teamExperience: 1,
-    equipmentAvailability: 1
+    projectNovelty: 0,
+    technicalComplexity: 0,
+    resourceUtilization: 0,
+    clientSophistication: 0,
+    budgetSize: 0,
+    timeframeConstraint: 0,
+    teamExperience: 0,
+    equipmentAvailability: 0
   });
 
   const factors = [
