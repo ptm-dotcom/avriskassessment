@@ -3,29 +3,3 @@ import '../styles/globals.css'
 export default function App({ Component, pageProps }) {
   return <Component {...pageProps} />
 }
-
-// ============================================
-
-// FILE 5: tailwind.config.js
-// Save this as tailwind.config.js
-module.exports = {
-  content: [
-    './pages/**/*.{js,jsx}',
-    './components/**/*.{js,jsx}',
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-
-// ============================================
-
-// FILE 6: postcss.config.js
-// Save this as postcss.config.js
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
