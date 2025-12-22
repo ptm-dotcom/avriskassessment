@@ -129,7 +129,7 @@ export default function AVRiskAssessment() {
       totalWeight += factor.weight;
     });
 
-    return (totalWeightedScore / totalWeight).toFixed(2);
+    return (totalWeightedScore).toFixed(2);
   };
 
   const getRiskLevel = (score) => {
