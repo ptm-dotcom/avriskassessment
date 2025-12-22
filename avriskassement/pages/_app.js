@@ -1,5 +1,3 @@
-// FILE 4: pages/_app.js
-// Save this as pages/_app.js
 import '../styles/globals.css'
 
 export default function App({ Component, pageProps }) {
