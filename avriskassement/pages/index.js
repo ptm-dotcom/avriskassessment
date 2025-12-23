@@ -20,7 +20,7 @@ export default function AVRiskAssessment() {
       description: 'How familiar is the team with this type of production?',
       scale: [
         { value: 0, label: 'Routine/Repeated', risk: 'Low' },
-        { value: 3, label: 'Similar to past', risk: 'Low-Med' },
+        { value: 1, label: 'Similar to past', risk: 'Low-Med' },
         { value: 7, label: 'Some new elements', risk: 'Medium' },
         { value: 31, label: 'Significantly novel', risk: 'Med-High' },
         { value: 127, label: 'Entirely new territory', risk: 'High' }
@@ -33,8 +33,8 @@ export default function AVRiskAssessment() {
       description: 'System integration, equipment sophistication, setup complexity',
       scale: [
         { value: 0, label: 'Dry-hire', risk: 'Low' },
-        { value: 3, label: 'Low complexity', risk: 'Low-Med' },
-        { value: 7, label: 'Moderate systems', risk: 'Medium' },
+        { value: 1, label: 'Low complexity', risk: 'Low-Med' },
+        { value: 7, label: 'Multiple departments', risk: 'Medium' },
         { value: 31, label: 'Highly complex', risk: 'Med-High' },
         { value: 127, label: 'Bleeding edge/Experimental', risk: 'High' }
       ],
