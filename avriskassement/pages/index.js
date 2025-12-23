@@ -32,9 +32,9 @@ export default function AVRiskAssessment() {
       label: 'Technical Complexity',
       description: 'System integration, equipment sophistication, setup complexity',
       scale: [
-        { value: 0, label: 'Simple/Standard', risk: 'Low' },
-        { value: 3, label: 'Moderate complexity', risk: 'Low-Med' },
-        { value: 7, label: 'Complex systems', risk: 'Medium' },
+        { value: 0, label: 'Dry-hire', risk: 'Low' },
+        { value: 3, label: 'Low complexity', risk: 'Low-Med' },
+        { value: 7, label: 'Moderate systems', risk: 'Medium' },
         { value: 31, label: 'Highly complex', risk: 'Med-High' },
         { value: 127, label: 'Bleeding edge/Experimental', risk: 'High' }
       ],
@@ -46,7 +46,7 @@ export default function AVRiskAssessment() {
       description: 'Percentage of available equipment/crew committed',
       scale: [
         { value: 0, label: '0% utilization', risk: 'Low' },
-        { value: 3, label: '1-24% utilization', risk: 'Low-Med' },
+        { value: 1, label: '1-24% utilization', risk: 'Low-Med' },
         { value: 7, label: '25-49% utilization', risk: 'Medium' },
         { value: 31, label: '50-74% utilization', risk: 'Med-High' },
         { value: 127, label: '75%+ utilization', risk: 'High' }
@@ -59,7 +59,7 @@ export default function AVRiskAssessment() {
       description: 'Client familiarity with AV production processes',
       scale: [
         { value: 0, label: 'Highly experienced', risk: 'Low' },
-        { value: 3, label: 'Experienced', risk: 'Low-Med' },
+        { value: 1, label: 'Experienced', risk: 'Low-Med' },
         { value: 7, label: 'Moderate experience', risk: 'Medium' },
         { value: 31, label: 'Limited experience', risk: 'Med-High' },
         { value: 127, label: 'First-time client', risk: 'High' }
@@ -72,7 +72,7 @@ export default function AVRiskAssessment() {
       description: 'Project budget relative to typical projects',
       scale: [
         { value: 0, label: '<$5k', risk: 'Low' },
-        { value: 3, label: '$5k-$10k', risk: 'Low-Med' },
+        { value: 1, label: '$5k-$10k', risk: 'Low-Med' },
         { value: 7, label: '$10k-$40k', risk: 'Medium' },
         { value: 31, label: '$40k-$100k', risk: 'Med-High' },
         { value: 127, label: '$100k+', risk: 'High' }
@@ -85,7 +85,7 @@ export default function AVRiskAssessment() {
       description: 'Prep time available vs. required',
       scale: [
         { value: 0, label: 'Ample time (>2x needed)', risk: 'Low' },
-        { value: 3, label: 'Comfortable (1.5x needed)', risk: 'Low-Med' },
+        { value: 1, label: 'Comfortable (1.5x needed)', risk: 'Low-Med' },
         { value: 7, label: 'Standard timeline', risk: 'Medium' },
         { value: 31, label: 'Tight timeline', risk: 'Med-High' },
         { value: 127, label: 'Rush/Emergency', risk: 'High' }
@@ -98,7 +98,7 @@ export default function AVRiskAssessment() {
       description: 'Assigned team experience with similar projects',
       scale: [
         { value: 0, label: 'Expert team', risk: 'Low' },
-        { value: 3, label: 'Experienced team', risk: 'Low-Med' },
+        { value: 1, label: 'Experienced team', risk: 'Low-Med' },
         { value: 7, label: 'Competent team', risk: 'Medium' },
         { value: 31, label: 'Learning team', risk: 'Med-High' },
         { value: 127, label: 'Inexperienced team', risk: 'High' }
@@ -110,10 +110,10 @@ export default function AVRiskAssessment() {
       label: 'Sub-hire Availability',
       description: 'Access to external equipment/crew if needed',
       scale: [
-        { value: 0, label: 'Multiple vendors available', risk: 'Low' },
+        { value: 0, label: 'Highly available', risk: 'Low' },
         { value: 3, label: 'Good sub-hire options', risk: 'Low-Med' },
         { value: 7, label: 'Limited sub-hire options', risk: 'Medium' },
-        { value: 31, label: 'Minimal sub-hire options', risk: 'Med-High' },
+        { value: 31, label: 'Interstate sub-hire only', risk: 'Med-High' },
         { value: 127, label: 'No sub-hire available', risk: 'High' }
       ],
       weight: 1.0
