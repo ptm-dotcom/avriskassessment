@@ -57,8 +57,11 @@ export default function RiskManagementPortal() {
     setLoading(true);
     try {
       if (config.subdomain && config.authToken) {
+        console.log('Fetching from Current RMS API...');
+        
         // Make actual API call to Current RMS
         const response = await fetch(`https://api.current-rms.com/api/v1/opportunities`, {
+          method: 'GET',
           headers: {
             'X-SUBDOMAIN': config.subdomain,
             'X-AUTH-TOKEN': config.authToken,
@@ -66,19 +69,30 @@ export default function RiskManagementPortal() {
           }
         });
         
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
           throw new Error(`API error: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
+        console.log('API Response:', data);
+        
+        // Check if data has opportunities array
+        if (!data.opportunities || !Array.isArray(data.opportunities)) {
+          console.error('Unexpected API response structure:', data);
+          throw new Error('Invalid API response structure');
+        }
         
         // Transform Current RMS data to our format
         const transformedOpps = data.opportunities.map(opp => ({
           id: opp.id,
           name: opp.subject || 'Untitled Opportunity',
           subject: opp.subject,
-          value: opp.charge_total || 0,
-          estimated_cost: opp.cost_total || 0,
+          value: parseFloat(opp.charge_total) || 0,
+          estimated_cost: parseFloat(opp.cost_total) || 0,
           owner: opp.owner?.name || 'Unassigned',
           starts_at: opp.starts_at,
           contact_name: opp.organisation?.name || 'No contact',
@@ -86,16 +100,18 @@ export default function RiskManagementPortal() {
           risk_level: opp.custom_fields?.risk_level || null
         }));
         
+        console.log('Transformed opportunities:', transformedOpps.length);
         setOpportunities(transformedOpps);
         setLastRefresh(new Date());
       } else {
+        console.log('No API config, using mock data');
         // No config, use mock data
         setOpportunities(mockOpportunities);
         setLastRefresh(new Date());
       }
     } catch (error) {
       console.error('Error loading opportunities:', error);
-      alert(`Error connecting to Current RMS: ${error.message}\n\nUsing demo data instead.`);
+      alert(`Error connecting to Current RMS: ${error.message}\n\nUsing demo data instead.\n\nCheck browser console for details.`);
       setOpportunities(mockOpportunities);
       setLastRefresh(new Date());
     } finally {
