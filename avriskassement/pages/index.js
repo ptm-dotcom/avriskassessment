@@ -393,6 +393,27 @@ export default function RiskManagementPortal() {
           </div>
         </div>
 
+        {/* Debug: Raw Opportunities List */}
+        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">🔍 Debug: All Loaded Opportunities</h2>
+          <p className="text-sm text-gray-600 mb-3">
+            Total loaded from API: {opportunities.length} | After date filter: {filteredOpportunities.length}
+          </p>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {opportunities.map(opp => (
+              <div key={opp.id} className="bg-white p-3 rounded border border-gray-200 text-sm">
+                <div className="font-semibold">#{opp.id} - {opp.name}</div>
+                <div className="text-gray-600">
+                  Start: {opp.starts_at} | 
+                  Value: ${(opp.value / 1000).toFixed(1)}k | 
+                  Risk Score: {opp.risk_score || 'none'} | 
+                  Risk Level: {opp.risk_level || 'none'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Risk Categories */}
         {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'UNSCORED'].map(level => {
           const opps = filteredCategorizedOpps[level];
