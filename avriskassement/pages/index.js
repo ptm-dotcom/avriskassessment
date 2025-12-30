@@ -12,9 +12,9 @@ export default function RiskManagementPortal() {
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [apiConfig, setApiConfig] = useState({
-    subdomain: 'https://alvgroup.current-rms.com/',
-    authToken: 'iP8WwFeq6hzyNsMrVsdw',
-    configured: true
+    subdomain: '',
+    authToken: '',
+    configured: false
   });
 
   // Mock data for demonstration - replace with real API calls
@@ -56,25 +56,46 @@ export default function RiskManagementPortal() {
   const loadOpportunities = async (config) => {
     setLoading(true);
     try {
-      // For demo purposes, use mock data
-      // In production, this would be:
-      // const response = await fetch(`https://${config.subdomain}.current-rms.com/api/v1/opportunities`, {
-      //   headers: {
-      //     'X-SUBDOMAIN': config.subdomain,
-      //     'X-AUTH-TOKEN': config.authToken,
-      //     'Content-Type': 'application/json'
-      //   }
-      // });
-      // const data = await response.json();
-      // setOpportunities(data);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setOpportunities(mockOpportunities);
-      setLastRefresh(new Date());
+      if (config.subdomain && config.authToken) {
+        // Make actual API call to Current RMS
+        const response = await fetch(`https://api.current-rms.com/api/v1/opportunities`, {
+          headers: {
+            'X-SUBDOMAIN': config.subdomain,
+            'X-AUTH-TOKEN': config.authToken,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Transform Current RMS data to our format
+        const transformedOpps = data.opportunities.map(opp => ({
+          id: opp.id,
+          name: opp.subject || 'Untitled Opportunity',
+          subject: opp.subject,
+          value: opp.charge_total || 0,
+          estimated_cost: opp.cost_total || 0,
+          owner: opp.owner?.name || 'Unassigned',
+          starts_at: opp.starts_at,
+          contact_name: opp.organisation?.name || 'No contact',
+          risk_score: parseFloat(opp.custom_fields?.risk_score || 0),
+          risk_level: opp.custom_fields?.risk_level || null
+        }));
+        
+        setOpportunities(transformedOpps);
+        setLastRefresh(new Date());
+      } else {
+        // No config, use mock data
+        setOpportunities(mockOpportunities);
+        setLastRefresh(new Date());
+      }
     } catch (error) {
       console.error('Error loading opportunities:', error);
-      alert('Error connecting to Current RMS. Using demo data.');
+      alert(`Error connecting to Current RMS: ${error.message}\n\nUsing demo data instead.`);
       setOpportunities(mockOpportunities);
       setLastRefresh(new Date());
     } finally {
