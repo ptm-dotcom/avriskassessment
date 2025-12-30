@@ -12,9 +12,9 @@ export default function RiskManagementPortal() {
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [apiConfig, setApiConfig] = useState({
-    subdomain: '',
-    authToken: '',
-    configured: false
+    subdomain: 'https://alvgroup.current-rms.com/',
+    authToken: 'iP8WwFeq6hzyNsMrVsdw',
+    configured: true
   });
 
   // Mock data for demonstration - replace with real API calls
