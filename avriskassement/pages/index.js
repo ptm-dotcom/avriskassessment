@@ -8,7 +8,7 @@ export default function RiskManagementPortal() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(null);
-  const [dateFilter, setDateFilter] = useState('30'); // '30', '60', '90', 'custom'
+  const [dateFilter, setDateFilter] = useState('all'); // 'all', '30', '60', '90', 'custom'
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [apiConfig, setApiConfig] = useState({
@@ -155,6 +155,14 @@ export default function RiskManagementPortal() {
     const today = new Date();
     const start = new Date();
     let end = new Date();
+    
+    if (dateFilter === 'all') {
+      // Return a very wide date range to include everything
+      return {
+        start: new Date('2000-01-01'),
+        end: new Date('2099-12-31')
+      };
+    }
     
     if (dateFilter === 'custom') {
       if (customStartDate && customEndDate) {
@@ -320,6 +328,16 @@ export default function RiskManagementPortal() {
             <div className="flex flex-wrap gap-3 items-end">
               <div className="flex gap-2">
                 <button
+                  onClick={() => setDateFilter('all')}
+                  className={`px-4 py-2 rounded-md font-medium ${
+                    dateFilter === 'all'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All Dates
+                </button>
+                <button
                   onClick={() => setDateFilter('30')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === '30'
@@ -327,7 +345,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  30 Days
+                  ±30 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('60')}
@@ -337,7 +355,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  60 Days
+                  ±60 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('90')}
@@ -347,7 +365,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  90 Days
+                  ±90 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('custom')}
