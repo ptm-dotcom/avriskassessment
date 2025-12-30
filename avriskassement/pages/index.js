@@ -11,6 +11,7 @@ export default function RiskManagementPortal() {
   const [dateFilter, setDateFilter] = useState('all'); // 'all', '30', '60', '90', 'custom'
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
+  const [showDebug, setShowDebug] = useState(false);
   const [apiConfig, setApiConfig] = useState({
     subdomain: '',
     authToken: '',
@@ -263,7 +264,14 @@ export default function RiskManagementPortal() {
   }
 
   if (view === 'assessment' && selectedOpp) {
-    return <RiskAssessment opp={selectedOpp} onBack={() => setView('dashboard')} />;
+    return <RiskAssessment 
+      opp={selectedOpp} 
+      apiConfig={apiConfig}
+      onBack={() => {
+        setView('dashboard');
+        loadOpportunities(apiConfig); // Reload to get updated data
+      }} 
+    />;
   }
 
   if (view === 'category' && selectedCategory) {
@@ -411,26 +419,47 @@ export default function RiskManagementPortal() {
           </div>
         </div>
 
-        {/* Debug: Raw Opportunities List */}
-        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">🔍 Debug: All Loaded Opportunities</h2>
-          <p className="text-sm text-gray-600 mb-3">
-            Total loaded from API: {opportunities.length} | After date filter: {filteredOpportunities.length}
-          </p>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {opportunities.map(opp => (
-              <div key={opp.id} className="bg-white p-3 rounded border border-gray-200 text-sm">
-                <div className="font-semibold">#{opp.id} - {opp.name}</div>
-                <div className="text-gray-600">
-                  Start: {opp.starts_at} | 
-                  Value: ${(opp.value / 1000).toFixed(1)}k | 
-                  Risk Score: {opp.risk_score || 'none'} | 
-                  Risk Level: {opp.risk_level || 'none'}
+        {/* Debug: Raw Opportunities List - Toggleable */}
+        {showDebug && (
+          <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-800">🔍 Debug: All Loaded Opportunities</h2>
+              <button 
+                onClick={() => setShowDebug(false)}
+                className="text-sm text-gray-600 hover:text-gray-800"
+              >
+                ✕ Close
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">
+              Total loaded from API: {opportunities.length} | After date filter: {filteredOpportunities.length}
+            </p>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {opportunities.map(opp => (
+                <div key={opp.id} className="bg-white p-3 rounded border border-gray-200 text-sm">
+                  <div className="font-semibold">#{opp.id} - {opp.name}</div>
+                  <div className="text-gray-600">
+                    Start: {opp.starts_at} | 
+                    Value: ${(opp.value / 1000).toFixed(1)}k | 
+                    Risk Score: {opp.risk_score || 'none'} | 
+                    Risk Level: {opp.risk_level || 'none'}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {!showDebug && (
+          <div className="mb-4">
+            <button 
+              onClick={() => setShowDebug(true)}
+              className="text-sm text-blue-600 hover:text-blue-700"
+            >
+              Show Debug Info
+            </button>
+          </div>
+        )}
 
         {/* Risk Categories */}
         {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'UNSCORED'].map(level => {
@@ -501,9 +530,10 @@ function CategoryDrilldown({ category, opportunities, apiConfig, onBack, onAsses
 
   const getCurrentRMSUrl = (oppId) => {
     if (apiConfig.subdomain) {
-      return `https://${apiConfig.subdomain}.current-rms.com/opportunities/${oppId}`;
+      const cleanSubdomain = apiConfig.subdomain.replace('.current-rms.com', '').trim();
+      return `https://${cleanSubdomain}.current-rms.com/opportunities/${oppId}`;
     }
-    return '#';
+    return `https://your-company.current-rms.com/opportunities/${oppId}`;
   };
 
   return (
@@ -598,7 +628,8 @@ function CategoryDrilldown({ category, opportunities, apiConfig, onBack, onAsses
   );
 }
 
-function RiskAssessment({ opp, onBack }) {
+function RiskAssessment({ opp, apiConfig, onBack }) {
+  const [saving, setSaving] = useState(false);
   const [scores, setScores] = useState({
     projectNovelty: 3,
     technicalComplexity: 3,
@@ -744,26 +775,62 @@ function RiskAssessment({ opp, onBack }) {
   };
 
   const handleSave = async () => {
+    setSaving(true);
     const riskScore = parseFloat(calculateRiskScore());
     const riskData = getRiskLevel(riskScore);
     
-    // In production, this would call the Current RMS API:
-    // await fetch(`https://${subdomain}.current-rms.com/api/v1/opportunities/${opp.id}`, {
-    //   method: 'PATCH',
-    //   headers: { ... },
-    //   body: JSON.stringify({
-    //     opportunity: {
-    //       custom_fields: {
-    //         risk_score: riskScore,
-    //         risk_level: riskData.level,
-    //         ...scores
-    //       }
-    //     }
-    //   })
-    // });
-    
-    alert(`Risk assessment saved!\n\nScore: ${riskScore}\nLevel: ${riskData.level}\nApproval: ${getApprovalRequired(riskScore)}`);
-    onBack();
+    try {
+      if (apiConfig.subdomain && apiConfig.authToken) {
+        console.log('Saving risk assessment to Current RMS...');
+        
+        const cleanSubdomain = apiConfig.subdomain.replace('.current-rms.com', '').trim();
+        
+        // Update opportunity with risk score via Current RMS API
+        const response = await fetch(`https://api.current-rms.com/api/v1/opportunities/${opp.id}?subdomain=${cleanSubdomain}`, {
+          method: 'PATCH',
+          headers: {
+            'X-SUBDOMAIN': cleanSubdomain,
+            'X-AUTH-TOKEN': apiConfig.authToken,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            opportunity: {
+              custom_fields: {
+                risk_score: riskScore,
+                risk_level: riskData.level,
+                risk_project_novelty: scores.projectNovelty,
+                risk_technical_complexity: scores.technicalComplexity,
+                risk_resource_utilization: scores.resourceUtilization,
+                risk_client_sophistication: scores.clientSophistication,
+                risk_budget_size: scores.budgetSize,
+                risk_timeframe_constraint: scores.timeframeConstraint,
+                risk_team_experience: scores.teamExperience,
+                risk_subhire_availability: scores.equipmentAvailability
+              }
+            }
+          })
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to save: ${response.status} ${errorText}`);
+        }
+        
+        console.log('Risk assessment saved successfully');
+        alert(`✅ Risk assessment saved successfully!\n\nScore: ${riskScore}\nLevel: ${riskData.level}\nApproval: ${getApprovalRequired(riskScore)}`);
+      } else {
+        // No API config - just show what would be saved
+        alert(`⚠️ Demo Mode - Risk assessment not saved to Current RMS\n\nScore: ${riskScore}\nLevel: ${riskData.level}\nApproval: ${getApprovalRequired(riskScore)}\n\nConfigure API credentials to save assessments.`);
+      }
+      
+      onBack();
+    } catch (error) {
+      console.error('Error saving risk assessment:', error);
+      alert(`❌ Error saving risk assessment: ${error.message}\n\nPlease try again or contact support.`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const riskScore = calculateRiskScore();
@@ -826,10 +893,25 @@ function RiskAssessment({ opp, onBack }) {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={handleSave} className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-semibold">
-              Save Risk Assessment
+            <button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {saving ? (
+                <>
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Risk Assessment'
+              )}
             </button>
-            <button onClick={onBack} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+            <button 
+              onClick={onBack}
+              disabled={saving}
+              className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+            >
               Cancel
             </button>
           </div>
