@@ -63,7 +63,13 @@ export default function RiskManagementPortal() {
     
     try {
       if (config.subdomain && config.authToken) {
-        console.log('Fetching from Current RMS API with pagination...');
+        // Calculate date range for API filtering
+        const { start, end } = getDateRange();
+        const startDate = start.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const endDate = end.toISOString().split('T')[0];
+        
+        console.log(`Fetching opportunities from ${startDate} to ${endDate}`);
+        console.log('Fetching from Current RMS API with pagination and date filtering...');
         
         const cleanSubdomain = config.subdomain.replace('.current-rms.com', '').trim();
         const allOpportunities = [];
@@ -75,8 +81,12 @@ export default function RiskManagementPortal() {
           console.log(`Fetching page ${currentPage}/${totalPages || '?'}...`);
           setLoadingProgress({ current: currentPage, total: totalPages });
           
-          // Current RMS API seems to only support 25 per page maximum
-          const url = `https://api.current-rms.com/api/v1/opportunities?page=${currentPage}&per_page=25`;
+          // Build URL with date filtering using Current RMS predicates
+          // Filter by starts_at >= startDate AND starts_at <= endDate
+          const url = `https://api.current-rms.com/api/v1/opportunities?` +
+            `q[starts_at_gteq]=${startDate}&` +
+            `q[starts_at_lteq]=${endDate}&` +
+            `page=${currentPage}&per_page=25`;
           
           console.log('Fetching URL:', url);
           
@@ -125,7 +135,7 @@ export default function RiskManagementPortal() {
             const perPage = data.meta.per_page || 25;
             const currentPageNum = data.meta.page;
             
-            console.log(`Total records: ${totalRowCount}`);
+            console.log(`Total records in date range: ${totalRowCount}`);
             console.log(`Per page: ${perPage}`);
             console.log(`Current page: ${currentPageNum}`);
             console.log(`Records in this response: ${data.meta.row_count}`);
@@ -189,6 +199,21 @@ export default function RiskManagementPortal() {
     } finally {
       setLoading(false);
       setLoadingProgress({ current: 0, total: 0 });
+    }
+  };
+
+  const handleDateFilterChange = (newFilter) => {
+    setDateFilter(newFilter);
+    // Reload opportunities with new date filter if API is configured
+    if (apiConfig.configured) {
+      loadOpportunities(apiConfig);
+    }
+  };
+
+  const handleCustomDateChange = () => {
+    // Reload opportunities when custom dates are applied
+    if (apiConfig.configured && customStartDate && customEndDate) {
+      loadOpportunities(apiConfig);
     }
   };
 
@@ -272,14 +297,9 @@ export default function RiskManagementPortal() {
     end.setDate(end.getDate() + days);
     return { start: today, end };
   };
-
-  const filteredOpportunities = opportunities.filter(opp => {
-    const oppDate = new Date(opp.starts_at);
-    const { start, end } = getDateRange();
-    return oppDate >= start && oppDate <= end;
-  });
-
-  const oppsWithCalculatedLevels = filteredOpportunities.map(opp => {
+  
+  // No need for client-side filtering anymore - the API returns pre-filtered data
+  const oppsWithCalculatedLevels = opportunities.map(opp => {
     let calculatedLevel = null;
     if (opp.risk_score > 0) {
       if (opp.risk_score <= 2.0) calculatedLevel = 'LOW';
@@ -454,7 +474,7 @@ export default function RiskManagementPortal() {
             <div className="flex flex-wrap gap-3 items-end">
               <div className="flex gap-2">
                 <button
-                  onClick={() => setDateFilter('30')}
+                  onClick={() => handleDateFilterChange('30')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === '30'
                       ? 'bg-blue-600 text-white'
@@ -464,7 +484,7 @@ export default function RiskManagementPortal() {
                   0-30 Days
                 </button>
                 <button
-                  onClick={() => setDateFilter('60')}
+                  onClick={() => handleDateFilterChange('60')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === '60'
                       ? 'bg-blue-600 text-white'
@@ -474,7 +494,7 @@ export default function RiskManagementPortal() {
                   30-60 Days
                 </button>
                 <button
-                  onClick={() => setDateFilter('90')}
+                  onClick={() => handleDateFilterChange('90')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === '90'
                       ? 'bg-blue-600 text-white'
@@ -484,7 +504,7 @@ export default function RiskManagementPortal() {
                   60-90 Days
                 </button>
                 <button
-                  onClick={() => setDateFilter('all')}
+                  onClick={() => handleDateFilterChange('all')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === 'all'
                       ? 'bg-blue-600 text-white'
@@ -494,7 +514,7 @@ export default function RiskManagementPortal() {
                   All (from today)
                 </button>
                 <button
-                  onClick={() => setDateFilter('custom')}
+                  onClick={() => handleDateFilterChange('custom')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === 'custom'
                       ? 'bg-blue-600 text-white'
@@ -520,13 +540,19 @@ export default function RiskManagementPortal() {
                     onChange={(e) => setCustomEndDate(e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded-md"
                   />
+                  <button
+                    onClick={handleCustomDateChange}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Apply
+                  </button>
                 </div>
               )}
             </div>
             
             <div className="flex items-center justify-between mt-2">
               <p className="text-sm text-gray-500">
-                Showing {filteredOpportunities.length} of {opportunities.length} opportunities
+                Showing {oppsWithCalculatedLevels.length} opportunities
               </p>
               {lastRefresh && (
                 <p className="text-sm text-gray-500">
