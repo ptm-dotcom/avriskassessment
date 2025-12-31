@@ -194,7 +194,10 @@ export default function RiskManagementPortal() {
           risk_team_experience: parseInt(opp.custom_fields?.risk_team_experience || 0),
           risk_subhire_availability: parseInt(opp.custom_fields?.risk_subhire_availability || 0),
           // Workflow tracking
-          risk_reviewed: opp.custom_fields?.risk_reviewed === 'true' || opp.custom_fields?.risk_reviewed === true,
+          risk_reviewed: opp.custom_fields?.risk_reviewed === 'true' || 
+                        opp.custom_fields?.risk_reviewed === true || 
+                        opp.custom_fields?.risk_reviewed === 1 ||
+                        opp.custom_fields?.risk_reviewed === '1',
           risk_mitigation_plan: parseInt(opp.custom_fields?.risk_mitigation_plan || 0), // 0=none, 1=partial, 2=complete
           risk_last_updated: opp.custom_fields?.risk_last_updated || null,
           risk_mitigation_notes: opp.custom_fields?.risk_mitigation_notes || ''
@@ -1122,7 +1125,7 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
                 risk_timeframe_constraint: scores.timeframeConstraint,
                 risk_team_experience: scores.teamExperience,
                 risk_subhire_availability: scores.equipmentAvailability,
-                risk_reviewed: reviewed,
+                risk_reviewed: reviewed ? 'true' : 'false',
                 risk_mitigation_plan: mitigationPlan,
                 risk_last_updated: currentTimestamp,
                 risk_mitigation_notes: mitigationNotes
