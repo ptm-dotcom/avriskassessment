@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, RefreshCw, Calendar, DollarSign, User } from 'lucide-react';
 
 export default function RiskManagementPortal() {
-  const [view, setView] = useState('dashboard'); // 'dashboard' or 'assessment' or 'category'
+  const [view, setView] = useState('dashboard');
   const [opportunities, setOpportunities] = useState([]);
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [lastRefresh, setLastRefresh] = useState(null);
-  const [dateFilter, setDateFilter] = useState('all'); // 'all', '30', '60', '90', 'custom'
+  const [dateFilter, setDateFilter] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDebug, setShowDebug] = useState(false);
@@ -18,7 +19,7 @@ export default function RiskManagementPortal() {
     configured: false
   });
 
-  // Mock data for demonstration - replace with real API calls
+  // Mock data for demonstration
   const mockOpportunities = [
     { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL' },
     { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM' },
@@ -41,7 +42,6 @@ export default function RiskManagementPortal() {
         loadOpportunities(config);
       }
     } else {
-      // Use mock data for demo
       setOpportunities(mockOpportunities);
       setLastRefresh(new Date());
     }
@@ -54,41 +54,84 @@ export default function RiskManagementPortal() {
     loadOpportunities(config);
   };
 
+  /**
+   * Fetch all opportunities with pagination support
+   */
   const loadOpportunities = async (config) => {
     setLoading(true);
+    setLoadingProgress({ current: 0, total: 0 });
+    
     try {
       if (config.subdomain && config.authToken) {
-        console.log('Fetching from Current RMS API...');
+        console.log('Fetching from Current RMS API with pagination...');
         
-        // Make actual API call to Current RMS
-        const response = await fetch(`https://api.current-rms.com/api/v1/opportunities`, {
-          method: 'GET',
-          headers: {
-            'X-SUBDOMAIN': config.subdomain,
-            'X-AUTH-TOKEN': config.authToken,
-            'Content-Type': 'application/json'
+        const cleanSubdomain = config.subdomain.replace('.current-rms.com', '').trim();
+        const allOpportunities = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        
+        // Fetch all pages
+        while (currentPage <= totalPages) {
+          console.log(`Fetching page ${currentPage}/${totalPages || '?'}...`);
+          setLoadingProgress({ current: currentPage, total: totalPages });
+          
+          const url = `https://api.current-rms.com/api/v1/opportunities?page=${currentPage}&per_page=100`;
+          
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'X-SUBDOMAIN': cleanSubdomain,
+              'X-AUTH-TOKEN': config.authToken,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          });
+          
+          console.log(`Page ${currentPage} response status:`, response.status);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error Response:', errorText);
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
           }
-        });
-        
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('API Error Response:', errorText);
-          throw new Error(`API error: ${response.status} ${response.statusText}`);
+          
+          const data = await response.json();
+          console.log(`Page ${currentPage} data:`, data);
+          
+          // Check if data has opportunities array
+          if (!data.opportunities || !Array.isArray(data.opportunities)) {
+            console.error('Unexpected API response structure:', data);
+            throw new Error('Invalid API response structure');
+          }
+          
+          // Add opportunities from this page
+          allOpportunities.push(...data.opportunities);
+          console.log(`Added ${data.opportunities.length} opportunities from page ${currentPage}. Total so far: ${allOpportunities.length}`);
+          
+          // Check pagination metadata
+          // Current RMS typically returns pagination info in the meta field
+          if (data.meta && data.meta.total_pages) {
+            totalPages = data.meta.total_pages;
+            console.log(`Total pages from meta: ${totalPages}`);
+          } else if (data.opportunities.length === 0 || data.opportunities.length < 100) {
+            // If we got fewer than 100 results, we're likely on the last page
+            console.log('Reached last page (fewer than 100 results)');
+            break;
+          }
+          
+          currentPage++;
+          
+          // Safety check to prevent infinite loops
+          if (currentPage > 1000) {
+            console.warn('Safety limit reached: stopping at page 1000');
+            break;
+          }
         }
         
-        const data = await response.json();
-        console.log('API Response:', data);
-        
-        // Check if data has opportunities array
-        if (!data.opportunities || !Array.isArray(data.opportunities)) {
-          console.error('Unexpected API response structure:', data);
-          throw new Error('Invalid API response structure');
-        }
+        console.log(`Finished fetching. Total opportunities: ${allOpportunities.length}`);
         
         // Transform Current RMS data to our format
-        const transformedOpps = data.opportunities.map(opp => ({
+        const transformedOpps = allOpportunities.map(opp => ({
           id: opp.id,
           name: opp.subject || 'Untitled Opportunity',
           subject: opp.subject,
@@ -106,7 +149,6 @@ export default function RiskManagementPortal() {
         setLastRefresh(new Date());
       } else {
         console.log('No API config, using mock data');
-        // No config, use mock data
         setOpportunities(mockOpportunities);
         setLastRefresh(new Date());
       }
@@ -117,6 +159,7 @@ export default function RiskManagementPortal() {
       setLastRefresh(new Date());
     } finally {
       setLoading(false);
+      setLoadingProgress({ current: 0, total: 0 });
     }
   };
 
@@ -158,7 +201,6 @@ export default function RiskManagementPortal() {
     let end = new Date();
     
     if (dateFilter === 'all') {
-      // Return a very wide date range to include everything
       return {
         start: new Date('2000-01-01'),
         end: new Date('2099-12-31')
@@ -172,15 +214,13 @@ export default function RiskManagementPortal() {
           end: new Date(customEndDate)
         };
       }
-      // Default to next 30 days if custom not set
       end.setDate(end.getDate() + 30);
       return { start: today, end };
     }
     
     const days = parseInt(dateFilter);
-    // Look both backwards and forwards
-    start.setDate(start.getDate() - days); // Past opportunities
-    end.setDate(end.getDate() + days); // Future opportunities
+    start.setDate(start.getDate() - days);
+    end.setDate(end.getDate() + days);
     return { start, end };
   };
 
@@ -190,7 +230,6 @@ export default function RiskManagementPortal() {
     return oppDate >= start && oppDate <= end;
   });
 
-  // Calculate risk levels on the fly from scores
   const oppsWithCalculatedLevels = filteredOpportunities.map(opp => {
     let calculatedLevel = null;
     if (opp.risk_score > 0) {
@@ -281,7 +320,7 @@ export default function RiskManagementPortal() {
       apiConfig={apiConfig}
       onBack={() => {
         setView('dashboard');
-        loadOpportunities(apiConfig); // Reload to get updated data
+        loadOpportunities(apiConfig);
       }} 
     />;
   }
@@ -308,7 +347,7 @@ export default function RiskManagementPortal() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
-                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.5-CACHE-BUST</span>
+                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.6-PAGINATION</span>
               </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
@@ -339,9 +378,24 @@ export default function RiskManagementPortal() {
               className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 ml-4"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+              {loading ? 'Loading...' : 'Refresh'}
             </button>
           </div>
+
+          {/* Loading Progress */}
+          {loading && loadingProgress.total > 0 && (
+            <div className="mb-4 bg-blue-50 border border-blue-200 rounded p-3">
+              <div className="text-sm text-blue-800 mb-1">
+                Loading page {loadingProgress.current} of {loadingProgress.total}...
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(loadingProgress.current / loadingProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Date Filter */}
           <div className="border-t pt-4">
@@ -423,7 +477,7 @@ export default function RiskManagementPortal() {
             
             <div className="flex items-center justify-between mt-2">
               <p className="text-sm text-gray-500">
-                Showing opportunities from {getDateRange().start.toLocaleDateString()} to {getDateRange().end.toLocaleDateString()}
+                Showing {filteredOpportunities.length} of {opportunities.length} opportunities
               </p>
               {lastRefresh && (
                 <p className="text-sm text-gray-500">
@@ -451,7 +505,6 @@ export default function RiskManagementPortal() {
             </p>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {opportunities.map(opp => {
-                // Calculate what the risk level SHOULD be
                 const calculatedLevel = opp.risk_score > 0 
                   ? (opp.risk_score <= 2.0 ? 'LOW' : opp.risk_score <= 3.0 ? 'MEDIUM' : opp.risk_score <= 4.0 ? 'HIGH' : 'CRITICAL')
                   : 'none';
@@ -523,6 +576,7 @@ export default function RiskManagementPortal() {
   );
 }
 
+// CategoryDrilldown and RiskAssessment components remain the same as before
 function CategoryDrilldown({ category, opportunities, apiConfig, onBack, onAssess }) {
   const getRiskIcon = (level) => {
     switch(level) {
@@ -579,7 +633,6 @@ function CategoryDrilldown({ category, opportunities, apiConfig, onBack, onAsses
             </div>
           </div>
 
-          {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -808,7 +861,6 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
         
         const cleanSubdomain = apiConfig.subdomain.replace('.current-rms.com', '').trim();
         
-        // Update opportunity with risk score via Current RMS API
         const response = await fetch(`https://api.current-rms.com/api/v1/opportunities/${opp.id}?subdomain=${cleanSubdomain}`, {
           method: 'PATCH',
           headers: {
@@ -843,7 +895,6 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
         console.log('Risk assessment saved successfully');
         alert(`✅ Risk assessment saved successfully!\n\nScore: ${riskScore}\nLevel: ${riskData.level}\nApproval: ${getApprovalRequired(riskScore)}`);
       } else {
-        // No API config - just show what would be saved
         alert(`⚠️ Demo Mode - Risk assessment not saved to Current RMS\n\nScore: ${riskScore}\nLevel: ${riskData.level}\nApproval: ${getApprovalRequired(riskScore)}\n\nConfigure API credentials to save assessments.`);
       }
       
