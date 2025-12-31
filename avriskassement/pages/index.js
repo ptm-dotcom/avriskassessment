@@ -318,7 +318,7 @@ export default function RiskManagementPortal() {
     UNSCORED: oppsWithCalculatedLevels.filter(o => !o.risk_level || o.risk_score === 0)
   };
 
-  const filteredTotalValue = filteredOpportunities.reduce((sum, opp) => sum + (opp.value || 0), 0);
+  const filteredTotalValue = oppsWithCalculatedLevels.reduce((sum, opp) => sum + (opp.value || 0), 0);
   const filteredHighRiskValue = [...filteredCategorizedOpps.CRITICAL, ...filteredCategorizedOpps.HIGH].reduce((sum, opp) => sum + (opp.value || 0), 0);
 
   if (!apiConfig.configured && view === 'dashboard') {
@@ -424,7 +424,7 @@ export default function RiskManagementPortal() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                 <div className="bg-gray-50 p-3 rounded">
                   <div className="text-xs text-gray-600 mb-1">Total Opportunities</div>
-                  <div className="text-xl font-bold text-gray-800">{filteredOpportunities.length}</div>
+                  <div className="text-xl font-bold text-gray-800">{oppsWithCalculatedLevels.length}</div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded">
                   <div className="text-xs text-gray-600 mb-1">Total Value</div>
@@ -576,7 +576,7 @@ export default function RiskManagementPortal() {
               </button>
             </div>
             <p className="text-sm text-gray-600 mb-3">
-              Total loaded from API: {opportunities.length} | After date filter: {filteredOpportunities.length}
+              Total opportunities in selected date range: {opportunities.length}
             </p>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {opportunities.map(opp => {
