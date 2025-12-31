@@ -380,7 +380,7 @@ export default function RiskManagementPortal() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
-                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.6-PAGINATION</span>
+                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded font-semibold">v3.0-SERVER-SIDE</span>
               </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
