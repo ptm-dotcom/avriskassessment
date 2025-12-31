@@ -16,6 +16,7 @@ export default function RiskManagementPortal() {
   // Workflow filters
   const [reviewedFilter, setReviewedFilter] = useState('all'); // 'all', 'reviewed', 'not_reviewed'
   const [mitigationFilter, setMitigationFilter] = useState('all'); // 'all', 'none', 'partial', 'complete', 'incomplete'
+  const [needsReviewFilter, setNeedsReviewFilter] = useState(false); // true = show only opportunities modified since last risk update
   const [apiConfig, setApiConfig] = useState({
     subdomain: '',
     authToken: '',
@@ -354,6 +355,22 @@ export default function RiskManagementPortal() {
     if (mitigationFilter === 'complete' && planStatus !== 2) return false;
     if (mitigationFilter === 'incomplete' && planStatus === 2) return false; // 0 or 1 only
     
+    // "Needs Review" filter - show opportunities modified after their last risk update
+    if (needsReviewFilter) {
+      // Parse dates - opportunity updated_at and risk_last_updated
+      const oppUpdatedAt = opp.updated_at ? new Date(opp.updated_at) : null;
+      const riskLastUpdated = opp.risk_last_updated ? new Date(opp.risk_last_updated) : null;
+      
+      // If no risk_last_updated, it needs review
+      if (!riskLastUpdated) return true;
+      
+      // If opportunity was updated after risk assessment, it needs review
+      if (oppUpdatedAt && oppUpdatedAt > riskLastUpdated) return true;
+      
+      // Otherwise, filter it out
+      return false;
+    }
+    
     return true;
   });
 
@@ -544,11 +561,12 @@ export default function RiskManagementPortal() {
                 <label className="text-sm font-medium text-gray-700">
                   Workflow Filters
                 </label>
-                {(reviewedFilter !== 'all' || mitigationFilter !== 'all') && (
+                {(reviewedFilter !== 'all' || mitigationFilter !== 'all' || needsReviewFilter) && (
                   <button
                     onClick={() => {
                       setReviewedFilter('all');
                       setMitigationFilter('all');
+                      setNeedsReviewFilter(false);
                     }}
                     className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                   >
@@ -652,6 +670,24 @@ export default function RiskManagementPortal() {
                   </button>
                 </div>
               </div>
+            </div>
+            
+            {/* Needs Review Filter - Third Row */}
+            <div className="mt-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={needsReviewFilter}
+                  onChange={(e) => setNeedsReviewFilter(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Show only opportunities modified since last risk update
+                </span>
+                <span className="text-xs text-gray-500">
+                  (Needs re-assessment)
+                </span>
+              </label>
             </div>
             </div>
             
