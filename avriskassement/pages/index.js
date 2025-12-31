@@ -294,7 +294,10 @@ export default function RiskManagementPortal() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-800 mb-1">Risk Management Portal</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
+                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.0</span>
+              </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
               {/* Summary Stats Inline */}
