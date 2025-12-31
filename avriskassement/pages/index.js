@@ -75,9 +75,8 @@ export default function RiskManagementPortal() {
           console.log(`Fetching page ${currentPage}/${totalPages || '?'}...`);
           setLoadingProgress({ current: currentPage, total: totalPages });
           
-          // Current RMS API might use different parameter names
-          // Try: per_page=100 (most common) or limit=100 or page_size=100
-          const url = `https://api.current-rms.com/api/v1/opportunities?page=${currentPage}&per_page=100`;
+          // Current RMS API seems to only support 25 per page maximum
+          const url = `https://api.current-rms.com/api/v1/opportunities?page=${currentPage}&per_page=25`;
           
           console.log('Fetching URL:', url);
           
@@ -119,48 +118,34 @@ export default function RiskManagementPortal() {
           // DETAILED PAGINATION METADATA LOGGING
           console.log('=== PAGINATION INFO ===');
           console.log('data.meta:', data.meta);
-          console.log('data.pagination:', data.pagination);
-          console.log('Response headers would contain Link header (not accessible in browser)');
           
-          // Check pagination metadata - try different possible fields
+          // Current RMS returns pagination in meta field
           if (data.meta) {
-            console.log('meta.total_pages:', data.meta.total_pages);
-            console.log('meta.total_count:', data.meta.total_count);
-            console.log('meta.page:', data.meta.page);
-            console.log('meta.per_page:', data.meta.per_page);
+            const totalRowCount = data.meta.total_row_count;
+            const perPage = data.meta.per_page || 25;
+            const currentPageNum = data.meta.page;
             
-            if (data.meta.total_pages) {
-              totalPages = data.meta.total_pages;
-              console.log(`✓ Found total pages in meta: ${totalPages}`);
+            console.log(`Total records: ${totalRowCount}`);
+            console.log(`Per page: ${perPage}`);
+            console.log(`Current page: ${currentPageNum}`);
+            console.log(`Records in this response: ${data.meta.row_count}`);
+            
+            // Calculate total pages
+            if (totalRowCount && perPage) {
+              totalPages = Math.ceil(totalRowCount / perPage);
+              console.log(`✓ Calculated total pages: ${totalPages} (${totalRowCount} records / ${perPage} per page)`);
             }
           }
           
-          if (data.pagination) {
-            console.log('pagination.total_pages:', data.pagination.total_pages);
-            console.log('pagination.total:', data.pagination.total);
-            console.log('pagination.current_page:', data.pagination.current_page);
-            console.log('pagination.per_page:', data.pagination.per_page);
-            
-            if (data.pagination.total_pages) {
-              totalPages = data.pagination.total_pages;
-              console.log(`✓ Found total pages in pagination: ${totalPages}`);
-            }
+          // Check if we're done
+          if (data.opportunities.length === 0) {
+            console.log('No more results, stopping pagination');
+            break;
           }
           
-          // If no pagination metadata found, check if this is the last page
-          if (totalPages === 1) {
-            const perPage = data.meta?.per_page || data.pagination?.per_page || 100;
-            console.log(`Per page setting: ${perPage}`);
-            
-            if (data.opportunities.length < perPage) {
-              console.log(`Reached last page (got ${data.opportunities.length} < ${perPage} results)`);
-              break;
-            } else if (data.opportunities.length === 0) {
-              console.log('Reached last page (0 results)');
-              break;
-            } else {
-              console.log(`Got ${data.opportunities.length} results, continuing to next page...`);
-            }
+          if (currentPage >= totalPages) {
+            console.log(`Reached last page (${currentPage}/${totalPages})`);
+            break;
           }
           
           currentPage++;
