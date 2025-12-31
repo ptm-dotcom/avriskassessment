@@ -24,16 +24,16 @@ export default function RiskManagementPortal() {
 
   // Mock data for demonstration
   const mockOpportunities = [
-    { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL', risk_project_novelty: 4, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 4, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 3, risk_reviewed: true, risk_mitigation_plan: 1 },
-    { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM', risk_project_novelty: 2, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 2, risk_subhire_availability: 2, risk_reviewed: true, risk_mitigation_plan: 2 },
-    { id: 1003, name: 'Product Launch - Stadium Event', subject: 'Product Launch', value: 95000, estimated_cost: 68000, owner: 'Sarah M.', starts_at: '2026-03-10', contact_name: 'Mike Chen', risk_score: 4.8, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 5, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 5, risk_reviewed: true, risk_mitigation_plan: 0 },
-    { id: 1004, name: 'Corporate Training Day', subject: 'Corporate', value: 3200, estimated_cost: 1800, owner: 'John D.', starts_at: '2026-01-25', contact_name: 'Emma Wilson', risk_score: 1.5, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 1, risk_resource_utilization: 1, risk_client_sophistication: 2, risk_budget_size: 1, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 1, risk_reviewed: true, risk_mitigation_plan: 2 },
-    { id: 1005, name: 'Music Festival Main Stage', subject: 'Festival', value: 125000, estimated_cost: 89000, owner: 'Sarah M.', starts_at: '2026-04-05', contact_name: 'David Lee', risk_score: 3.8, risk_level: 'HIGH', risk_project_novelty: 4, risk_technical_complexity: 4, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 3, risk_subhire_availability: 3, risk_reviewed: false, risk_mitigation_plan: 0 },
-    { id: 1006, name: 'AGM - Convention Center', subject: 'AGM', value: 12000, estimated_cost: 7500, owner: 'Mike T.', starts_at: '2026-02-01', contact_name: 'Lisa Brown', risk_score: 1.8, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 2, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 2, risk_reviewed: true, risk_mitigation_plan: 2 },
-    { id: 1007, name: 'Trade Show Booth', subject: 'Trade Show', value: 6500, estimated_cost: 4200, owner: 'John D.', starts_at: '2026-01-30', contact_name: 'Tom Anderson', risk_score: 2.8, risk_level: 'MEDIUM', risk_project_novelty: 3, risk_technical_complexity: 3, risk_resource_utilization: 3, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 3, risk_team_experience: 2, risk_subhire_availability: 3, risk_reviewed: false, risk_mitigation_plan: 0 },
-    { id: 1008, name: 'Live Broadcast - Sports Arena', subject: 'Broadcast', value: 78000, estimated_cost: 55000, owner: 'Sarah M.', starts_at: '2026-02-20', contact_name: 'Rachel Green', risk_score: 4.5, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 4, risk_subhire_availability: 4, risk_reviewed: true, risk_mitigation_plan: 1 },
-    { id: 1009, name: 'New Client Consultation', subject: 'Consultation', value: 15000, estimated_cost: 9000, owner: 'John D.', starts_at: '2026-01-28', contact_name: 'Peter Wang', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0, risk_reviewed: false, risk_mitigation_plan: 0 },
-    { id: 1010, name: 'Charity Gala Evening', subject: 'Gala', value: 22000, estimated_cost: 14000, owner: 'Mike T.', starts_at: '2026-02-10', contact_name: 'Jane Smith', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0, risk_reviewed: false, risk_mitigation_plan: 0 }
+    { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL', risk_project_novelty: 4, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 4, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 3, risk_reviewed: true, risk_mitigation_plan: 1, risk_last_updated: '2025-12-20T14:30:00Z', risk_mitigation_notes: 'Additional technical crew on standby. Backup equipment arranged with local supplier.' },
+    { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM', risk_project_novelty: 2, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 2, risk_subhire_availability: 2, risk_reviewed: true, risk_mitigation_plan: 2, risk_last_updated: '2025-12-18T10:15:00Z', risk_mitigation_notes: 'Standard wedding package. Experienced team assigned. All contingencies covered.' },
+    { id: 1003, name: 'Product Launch - Stadium Event', subject: 'Product Launch', value: 95000, estimated_cost: 68000, owner: 'Sarah M.', starts_at: '2026-03-10', contact_name: 'Mike Chen', risk_score: 4.8, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 5, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 5, risk_reviewed: true, risk_mitigation_plan: 0, risk_last_updated: '2025-12-22T16:45:00Z', risk_mitigation_notes: '' },
+    { id: 1004, name: 'Corporate Training Day', subject: 'Corporate', value: 3200, estimated_cost: 1800, owner: 'John D.', starts_at: '2026-01-25', contact_name: 'Emma Wilson', risk_score: 1.5, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 1, risk_resource_utilization: 1, risk_client_sophistication: 2, risk_budget_size: 1, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 1, risk_reviewed: true, risk_mitigation_plan: 2, risk_last_updated: '2025-12-15T09:00:00Z', risk_mitigation_notes: 'Low risk event. Standard setup with experienced team.' },
+    { id: 1005, name: 'Music Festival Main Stage', subject: 'Festival', value: 125000, estimated_cost: 89000, owner: 'Sarah M.', starts_at: '2026-04-05', contact_name: 'David Lee', risk_score: 3.8, risk_level: 'HIGH', risk_project_novelty: 4, risk_technical_complexity: 4, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 3, risk_subhire_availability: 3, risk_reviewed: false, risk_mitigation_plan: 0, risk_last_updated: null, risk_mitigation_notes: '' },
+    { id: 1006, name: 'AGM - Convention Center', subject: 'AGM', value: 12000, estimated_cost: 7500, owner: 'Mike T.', starts_at: '2026-02-01', contact_name: 'Lisa Brown', risk_score: 1.8, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 2, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 2, risk_reviewed: true, risk_mitigation_plan: 2, risk_last_updated: '2025-12-19T11:30:00Z', risk_mitigation_notes: 'Routine AGM setup. Client familiar with our services.' },
+    { id: 1007, name: 'Trade Show Booth', subject: 'Trade Show', value: 6500, estimated_cost: 4200, owner: 'John D.', starts_at: '2026-01-30', contact_name: 'Tom Anderson', risk_score: 2.8, risk_level: 'MEDIUM', risk_project_novelty: 3, risk_technical_complexity: 3, risk_resource_utilization: 3, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 3, risk_team_experience: 2, risk_subhire_availability: 3, risk_reviewed: false, risk_mitigation_plan: 0, risk_last_updated: null, risk_mitigation_notes: '' },
+    { id: 1008, name: 'Live Broadcast - Sports Arena', subject: 'Broadcast', value: 78000, estimated_cost: 55000, owner: 'Sarah M.', starts_at: '2026-02-20', contact_name: 'Rachel Green', risk_score: 4.5, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 4, risk_subhire_availability: 4, risk_reviewed: true, risk_mitigation_plan: 1, risk_last_updated: '2025-12-21T13:20:00Z', risk_mitigation_notes: 'Broadcast specialist confirmed. Redundant transmission equipment arranged. Weather contingency in place.' },
+    { id: 1009, name: 'New Client Consultation', subject: 'Consultation', value: 15000, estimated_cost: 9000, owner: 'John D.', starts_at: '2026-01-28', contact_name: 'Peter Wang', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0, risk_reviewed: false, risk_mitigation_plan: 0, risk_last_updated: null, risk_mitigation_notes: '' },
+    { id: 1010, name: 'Charity Gala Evening', subject: 'Gala', value: 22000, estimated_cost: 14000, owner: 'Mike T.', starts_at: '2026-02-10', contact_name: 'Jane Smith', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0, risk_reviewed: false, risk_mitigation_plan: 0, risk_last_updated: null, risk_mitigation_notes: '' }
   ];
 
   useEffect(() => {
@@ -195,7 +195,9 @@ export default function RiskManagementPortal() {
           risk_subhire_availability: parseInt(opp.custom_fields?.risk_subhire_availability || 0),
           // Workflow tracking
           risk_reviewed: opp.custom_fields?.risk_reviewed === 'true' || opp.custom_fields?.risk_reviewed === true,
-          risk_mitigation_plan: parseInt(opp.custom_fields?.risk_mitigation_plan || 0) // 0=none, 1=partial, 2=complete
+          risk_mitigation_plan: parseInt(opp.custom_fields?.risk_mitigation_plan || 0), // 0=none, 1=partial, 2=complete
+          risk_last_updated: opp.custom_fields?.risk_last_updated || null,
+          risk_mitigation_notes: opp.custom_fields?.risk_mitigation_notes || ''
         }));
         
         console.log('Transformed opportunities:', transformedOpps.length);
@@ -923,6 +925,7 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
   });
   const [reviewed, setReviewed] = useState(opp.risk_reviewed || false);
   const [mitigationPlan, setMitigationPlan] = useState(opp.risk_mitigation_plan || 0);
+  const [mitigationNotes, setMitigationNotes] = useState(opp.risk_mitigation_notes || '');
 
   const factors = [
     {
@@ -1061,6 +1064,7 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
     setSaving(true);
     const riskScore = parseFloat(calculateRiskScore());
     const riskData = getRiskLevel(riskScore);
+    const currentTimestamp = new Date().toISOString();
     
     try {
       if (apiConfig.subdomain && apiConfig.authToken) {
@@ -1090,7 +1094,9 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
                 risk_team_experience: scores.teamExperience,
                 risk_subhire_availability: scores.equipmentAvailability,
                 risk_reviewed: reviewed,
-                risk_mitigation_plan: mitigationPlan
+                risk_mitigation_plan: mitigationPlan,
+                risk_last_updated: currentTimestamp,
+                risk_mitigation_notes: mitigationNotes
               }
             }
           })
@@ -1225,6 +1231,28 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Mitigation Plan Notes */}
+          <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <label className="block font-semibold text-gray-800 mb-2">
+              Mitigation Plan Notes
+              {opp.risk_last_updated && (
+                <span className="ml-2 text-xs font-normal text-gray-500">
+                  Last updated: {new Date(opp.risk_last_updated).toLocaleString()}
+                </span>
+              )}
+            </label>
+            <textarea
+              value={mitigationNotes}
+              onChange={(e) => setMitigationNotes(e.target.value)}
+              placeholder="Describe the mitigation strategies, backup plans, contingencies, or special arrangements for this opportunity..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={4}
+            />
+            <p className="text-xs text-gray-600 mt-1">
+              Document key mitigation strategies, backup equipment, additional crew, contingencies, or special arrangements.
+            </p>
           </div>
 
           {/* Action buttons */}
