@@ -9,7 +9,7 @@ export default function RiskManagementPortal() {
   const [loading, setLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [lastRefresh, setLastRefresh] = useState(null);
-  const [dateFilter, setDateFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('30'); // '30', '60', '90', 'all', 'custom'
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDebug, setShowDebug] = useState(false);
@@ -231,8 +231,9 @@ export default function RiskManagementPortal() {
     let end = new Date(today);
     
     if (dateFilter === 'all') {
+      // Show all opportunities from today forward
       return {
-        start: new Date('2000-01-01'),
+        start: today,
         end: new Date('2099-12-31')
       };
     }
@@ -244,12 +245,30 @@ export default function RiskManagementPortal() {
           end: new Date(customEndDate)
         };
       }
+      // Default to next 30 days if custom not set
       end.setDate(end.getDate() + 30);
       return { start: today, end };
     }
     
-    // For 30, 60, 90 day filters - show only future opportunities from today
+    // For 30, 60, 90 day filters - show ranges 0-30, 30-60, 60-90
     const days = parseInt(dateFilter);
+    if (days === 30) {
+      // 0-30 days from today
+      end.setDate(end.getDate() + 30);
+      return { start: today, end };
+    } else if (days === 60) {
+      // 30-60 days from today
+      start.setDate(start.getDate() + 30);
+      end.setDate(end.getDate() + 60);
+      return { start, end };
+    } else if (days === 90) {
+      // 60-90 days from today
+      start.setDate(start.getDate() + 60);
+      end.setDate(end.getDate() + 90);
+      return { start, end };
+    }
+    
+    // Fallback (shouldn't reach here)
     end.setDate(end.getDate() + days);
     return { start: today, end };
   };
@@ -435,16 +454,6 @@ export default function RiskManagementPortal() {
             <div className="flex flex-wrap gap-3 items-end">
               <div className="flex gap-2">
                 <button
-                  onClick={() => setDateFilter('all')}
-                  className={`px-4 py-2 rounded-md font-medium ${
-                    dateFilter === 'all'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  All Dates
-                </button>
-                <button
                   onClick={() => setDateFilter('30')}
                   className={`px-4 py-2 rounded-md font-medium ${
                     dateFilter === '30'
@@ -452,7 +461,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  Next 30 Days
+                  0-30 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('60')}
@@ -462,7 +471,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  Next 60 Days
+                  30-60 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('90')}
@@ -472,7 +481,17 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  Next 90 Days
+                  60-90 Days
+                </button>
+                <button
+                  onClick={() => setDateFilter('all')}
+                  className={`px-4 py-2 rounded-md font-medium ${
+                    dateFilter === 'all'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All (from today)
                 </button>
                 <button
                   onClick={() => setDateFilter('custom')}
