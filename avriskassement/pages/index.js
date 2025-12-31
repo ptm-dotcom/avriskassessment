@@ -190,12 +190,24 @@ export default function RiskManagementPortal() {
     return oppDate >= start && oppDate <= end;
   });
 
+  // Calculate risk levels on the fly from scores
+  const oppsWithCalculatedLevels = filteredOpportunities.map(opp => {
+    let calculatedLevel = null;
+    if (opp.risk_score > 0) {
+      if (opp.risk_score <= 2.0) calculatedLevel = 'LOW';
+      else if (opp.risk_score <= 3.0) calculatedLevel = 'MEDIUM';
+      else if (opp.risk_score <= 4.0) calculatedLevel = 'HIGH';
+      else calculatedLevel = 'CRITICAL';
+    }
+    return { ...opp, risk_level: calculatedLevel };
+  });
+
   const filteredCategorizedOpps = {
-    CRITICAL: filteredOpportunities.filter(o => o.risk_level === 'CRITICAL'),
-    HIGH: filteredOpportunities.filter(o => o.risk_level === 'HIGH'),
-    MEDIUM: filteredOpportunities.filter(o => o.risk_level === 'MEDIUM'),
-    LOW: filteredOpportunities.filter(o => o.risk_level === 'LOW'),
-    UNSCORED: filteredOpportunities.filter(o => !o.risk_level || o.risk_score === 0)
+    CRITICAL: oppsWithCalculatedLevels.filter(o => o.risk_level === 'CRITICAL'),
+    HIGH: oppsWithCalculatedLevels.filter(o => o.risk_level === 'HIGH'),
+    MEDIUM: oppsWithCalculatedLevels.filter(o => o.risk_level === 'MEDIUM'),
+    LOW: oppsWithCalculatedLevels.filter(o => o.risk_level === 'LOW'),
+    UNSCORED: oppsWithCalculatedLevels.filter(o => !o.risk_level || o.risk_score === 0)
   };
 
   const filteredTotalValue = filteredOpportunities.reduce((sum, opp) => sum + (opp.value || 0), 0);
@@ -296,7 +308,7 @@ export default function RiskManagementPortal() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
-                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.2-debug</span>
+                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.3</span>
               </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
