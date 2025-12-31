@@ -21,16 +21,16 @@ export default function RiskManagementPortal() {
 
   // Mock data for demonstration
   const mockOpportunities = [
-    { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL' },
-    { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM' },
-    { id: 1003, name: 'Product Launch - Stadium Event', subject: 'Product Launch', value: 95000, estimated_cost: 68000, owner: 'Sarah M.', starts_at: '2026-03-10', contact_name: 'Mike Chen', risk_score: 4.8, risk_level: 'CRITICAL' },
-    { id: 1004, name: 'Corporate Training Day', subject: 'Corporate', value: 3200, estimated_cost: 1800, owner: 'John D.', starts_at: '2026-01-25', contact_name: 'Emma Wilson', risk_score: 1.5, risk_level: 'LOW' },
-    { id: 1005, name: 'Music Festival Main Stage', subject: 'Festival', value: 125000, estimated_cost: 89000, owner: 'Sarah M.', starts_at: '2026-04-05', contact_name: 'David Lee', risk_score: 3.8, risk_level: 'HIGH' },
-    { id: 1006, name: 'AGM - Convention Center', subject: 'AGM', value: 12000, estimated_cost: 7500, owner: 'Mike T.', starts_at: '2026-02-01', contact_name: 'Lisa Brown', risk_score: 1.8, risk_level: 'LOW' },
-    { id: 1007, name: 'Trade Show Booth', subject: 'Trade Show', value: 6500, estimated_cost: 4200, owner: 'John D.', starts_at: '2026-01-30', contact_name: 'Tom Anderson', risk_score: 2.8, risk_level: 'MEDIUM' },
-    { id: 1008, name: 'Live Broadcast - Sports Arena', subject: 'Broadcast', value: 78000, estimated_cost: 55000, owner: 'Sarah M.', starts_at: '2026-02-20', contact_name: 'Rachel Green', risk_score: 4.5, risk_level: 'CRITICAL' },
-    { id: 1009, name: 'New Client Consultation', subject: 'Consultation', value: 15000, estimated_cost: 9000, owner: 'John D.', starts_at: '2026-01-28', contact_name: 'Peter Wang', risk_score: 0, risk_level: null },
-    { id: 1010, name: 'Charity Gala Evening', subject: 'Gala', value: 22000, estimated_cost: 14000, owner: 'Mike T.', starts_at: '2026-02-10', contact_name: 'Jane Smith', risk_score: 0, risk_level: null }
+    { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL', risk_project_novelty: 4, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 4, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 3 },
+    { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM', risk_project_novelty: 2, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 2, risk_subhire_availability: 2 },
+    { id: 1003, name: 'Product Launch - Stadium Event', subject: 'Product Launch', value: 95000, estimated_cost: 68000, owner: 'Sarah M.', starts_at: '2026-03-10', contact_name: 'Mike Chen', risk_score: 4.8, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 5, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 5 },
+    { id: 1004, name: 'Corporate Training Day', subject: 'Corporate', value: 3200, estimated_cost: 1800, owner: 'John D.', starts_at: '2026-01-25', contact_name: 'Emma Wilson', risk_score: 1.5, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 1, risk_resource_utilization: 1, risk_client_sophistication: 2, risk_budget_size: 1, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 1 },
+    { id: 1005, name: 'Music Festival Main Stage', subject: 'Festival', value: 125000, estimated_cost: 89000, owner: 'Sarah M.', starts_at: '2026-04-05', contact_name: 'David Lee', risk_score: 3.8, risk_level: 'HIGH', risk_project_novelty: 4, risk_technical_complexity: 4, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 3, risk_subhire_availability: 3 },
+    { id: 1006, name: 'AGM - Convention Center', subject: 'AGM', value: 12000, estimated_cost: 7500, owner: 'Mike T.', starts_at: '2026-02-01', contact_name: 'Lisa Brown', risk_score: 1.8, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 2, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 2 },
+    { id: 1007, name: 'Trade Show Booth', subject: 'Trade Show', value: 6500, estimated_cost: 4200, owner: 'John D.', starts_at: '2026-01-30', contact_name: 'Tom Anderson', risk_score: 2.8, risk_level: 'MEDIUM', risk_project_novelty: 3, risk_technical_complexity: 3, risk_resource_utilization: 3, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 3, risk_team_experience: 2, risk_subhire_availability: 3 },
+    { id: 1008, name: 'Live Broadcast - Sports Arena', subject: 'Broadcast', value: 78000, estimated_cost: 55000, owner: 'Sarah M.', starts_at: '2026-02-20', contact_name: 'Rachel Green', risk_score: 4.5, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 4, risk_subhire_availability: 4 },
+    { id: 1009, name: 'New Client Consultation', subject: 'Consultation', value: 15000, estimated_cost: 9000, owner: 'John D.', starts_at: '2026-01-28', contact_name: 'Peter Wang', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0 },
+    { id: 1010, name: 'Charity Gala Evening', subject: 'Gala', value: 22000, estimated_cost: 14000, owner: 'Mike T.', starts_at: '2026-02-10', contact_name: 'Jane Smith', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0 }
   ];
 
   useEffect(() => {
@@ -180,7 +180,16 @@ export default function RiskManagementPortal() {
           starts_at: opp.starts_at,
           contact_name: opp.organisation?.name || 'No contact',
           risk_score: parseFloat(opp.custom_fields?.risk_score || 0),
-          risk_level: opp.custom_fields?.risk_level || null
+          risk_level: opp.custom_fields?.risk_level || null,
+          // Individual risk factor scores
+          risk_project_novelty: parseInt(opp.custom_fields?.risk_project_novelty || 0),
+          risk_technical_complexity: parseInt(opp.custom_fields?.risk_technical_complexity || 0),
+          risk_resource_utilization: parseInt(opp.custom_fields?.risk_resource_utilization || 0),
+          risk_client_sophistication: parseInt(opp.custom_fields?.risk_client_sophistication || 0),
+          risk_budget_size: parseInt(opp.custom_fields?.risk_budget_size || 0),
+          risk_timeframe_constraint: parseInt(opp.custom_fields?.risk_timeframe_constraint || 0),
+          risk_team_experience: parseInt(opp.custom_fields?.risk_team_experience || 0),
+          risk_subhire_availability: parseInt(opp.custom_fields?.risk_subhire_availability || 0)
         }));
         
         console.log('Transformed opportunities:', transformedOpps.length);
@@ -782,14 +791,14 @@ function CategoryDrilldown({ category, opportunities, apiConfig, onBack, onAsses
 function RiskAssessment({ opp, apiConfig, onBack }) {
   const [saving, setSaving] = useState(false);
   const [scores, setScores] = useState({
-    projectNovelty: 3,
-    technicalComplexity: 3,
-    resourceUtilization: 3,
-    clientSophistication: 3,
-    budgetSize: 3,
-    timeframeConstraint: 3,
-    teamExperience: 3,
-    equipmentAvailability: 3
+    projectNovelty: opp.risk_project_novelty || 3,
+    technicalComplexity: opp.risk_technical_complexity || 3,
+    resourceUtilization: opp.risk_resource_utilization || 3,
+    clientSophistication: opp.risk_client_sophistication || 3,
+    budgetSize: opp.risk_budget_size || 3,
+    timeframeConstraint: opp.risk_timeframe_constraint || 3,
+    teamExperience: opp.risk_team_experience || 3,
+    equipmentAvailability: opp.risk_subhire_availability || 3
   });
 
   const factors = [
