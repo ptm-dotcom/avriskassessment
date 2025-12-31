@@ -226,8 +226,9 @@ export default function RiskManagementPortal() {
 
   const getDateRange = () => {
     const today = new Date();
-    const start = new Date();
-    let end = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const start = new Date(today);
+    let end = new Date(today);
     
     if (dateFilter === 'all') {
       return {
@@ -247,10 +248,10 @@ export default function RiskManagementPortal() {
       return { start: today, end };
     }
     
+    // For 30, 60, 90 day filters - show only future opportunities from today
     const days = parseInt(dateFilter);
-    start.setDate(start.getDate() - days);
     end.setDate(end.getDate() + days);
-    return { start, end };
+    return { start: today, end };
   };
 
   const filteredOpportunities = opportunities.filter(opp => {
@@ -451,7 +452,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  ±30 Days
+                  Next 30 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('60')}
@@ -461,7 +462,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  ±60 Days
+                  Next 60 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('90')}
@@ -471,7 +472,7 @@ export default function RiskManagementPortal() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  ±90 Days
+                  Next 90 Days
                 </button>
                 <button
                   onClick={() => setDateFilter('custom')}
