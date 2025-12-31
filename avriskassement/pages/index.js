@@ -319,8 +319,20 @@ export default function RiskManagementPortal() {
 
   // Apply workflow filters
   const workflowFilteredOpps = oppsWithCalculatedLevels.filter(opp => {
-    // Review filter - handle both boolean and string values
-    const isReviewed = opp.risk_reviewed === true || opp.risk_reviewed === 'true';
+    // Review filter - Current RMS returns "Yes" or empty string ""
+    const isReviewed = opp.risk_reviewed === 'Yes' || opp.risk_reviewed === true || opp.risk_reviewed === 'true' || opp.risk_reviewed === 1 || opp.risk_reviewed === '1';
+    
+    // DEBUG: Log the first few opportunities to see what we're getting
+    if (oppsWithCalculatedLevels.indexOf(opp) < 3) {
+      console.log(`DEBUG Opp ${opp.id}:`, {
+        name: opp.name,
+        risk_reviewed_raw: opp.risk_reviewed,
+        risk_reviewed_type: typeof opp.risk_reviewed,
+        isReviewed_calculated: isReviewed,
+        reviewedFilter: reviewedFilter
+      });
+    }
+    
     if (reviewedFilter === 'reviewed' && !isReviewed) return false;
     if (reviewedFilter === 'not_reviewed' && isReviewed) return false;
     
@@ -381,7 +393,7 @@ export default function RiskManagementPortal() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
-                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded font-semibold">v3.0.1-SERVER-SIDE</span>
+                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded font-semibold">v3.0.3-FIXED</span>
               </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
@@ -1044,7 +1056,7 @@ function RiskAssessment({ opp, apiConfig, callCurrentRMS, onBack }) {
               risk_timeframe_constraint: scores.timeframeConstraint,
               risk_team_experience: scores.teamExperience,
               risk_subhire_availability: scores.equipmentAvailability,
-              risk_reviewed: reviewed ? 'true' : 'false',
+              risk_reviewed: reviewed ? 'Yes' : '',
               risk_mitigation_plan: mitigationPlan,
               risk_last_updated: currentTimestamp,
               risk_mitigation_notes: mitigationNotes
