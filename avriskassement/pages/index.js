@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, RefreshCw, Calendar, DollarSign, User } from 'lucide-react';
 
 // Version tracking
-const VERSION = "3.0.3-FIXED";
+const VERSION = "3.0.4-PAGINATION-FIX";
 
 export default function RiskManagementPortal() {
   const [view, setView] = useState('dashboard');
@@ -12,28 +12,19 @@ export default function RiskManagementPortal() {
   const [loading, setLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [lastRefresh, setLastRefresh] = useState(null);
-  const [dateFilter, setDateFilter] = useState('30'); // '30', '60', '90', 'all', 'custom'
+  const [dateFilter, setDateFilter] = useState('30');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDebug, setShowDebug] = useState(false);
-  // Workflow filters
-  const [reviewedFilter, setReviewedFilter] = useState('all'); // 'all', 'reviewed', 'not_reviewed'
-  const [mitigationFilter, setMitigationFilter] = useState('all'); // 'all', 'none', 'partial', 'complete', 'incomplete'
-  const [apiConfig, setApiConfig] = useState({
-    subdomain: '',
-    authToken: '',
-    configured: false
-  });
-
-  // Pagination state
+  const [reviewedFilter, setReviewedFilter] = useState('all');
+  const [mitigationFilter, setMitigationFilter] = useState('all');
+  
+  // Pagination for DISPLAY only (after filtering)
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const ITEMS_PER_PAGE = 50;
 
   /**
    * Helper function to call the server-side API route
-   * This replaces direct Current RMS API calls
    */
   const callCurrentRMS = async (endpoint, method = 'GET', body = null) => {
     const response = await fetch('/api/current-rms', {
@@ -82,34 +73,44 @@ export default function RiskManagementPortal() {
           start: customStartDate ? new Date(customStartDate) : null,
           end: customEndDate ? new Date(customEndDate) : null
         };
-      default: // 'all'
+      default:
         return { start: null, end: null };
     }
   };
 
-  // Fetch opportunities from Current RMS API with pagination
-  const fetchOpportunities = async (page = 1) => {
+  /**
+   * Fetch ALL opportunities from Current RMS API
+   * This fetches all pages to ensure filtering works correctly
+   */
+  const fetchOpportunities = async () => {
     setLoading(true);
     setLoadingProgress({ current: 0, total: 0 });
     
     try {
-      // Calculate offset for pagination
-      const offset = (page - 1) * ITEMS_PER_PAGE;
+      // First, get the first page to find out total count
+      const firstPage = await callCurrentRMS('opportunities?page=1&per_page=100', 'GET');
       
-      // Fetch from API with pagination
-      const data = await callCurrentRMS(
-        `opportunities?page=${page}&per_page=${ITEMS_PER_PAGE}`,
-        'GET'
-      );
-
-      console.log('API Response:', data);
-
-      const opps = data.opportunities || [];
-      setTotalCount(data.meta?.total_row_count || opps.length);
-      setTotalPages(Math.ceil((data.meta?.total_row_count || opps.length) / ITEMS_PER_PAGE));
+      const totalCount = firstPage.meta?.total_row_count || 0;
+      const perPage = 100; // Fetch 100 at a time for efficiency
+      const totalPages = Math.ceil(totalCount / perPage);
       
+      setLoadingProgress({ current: 1, total: totalPages });
+      
+      let allOpportunities = [...(firstPage.opportunities || [])];
+      
+      // Fetch remaining pages
+      if (totalPages > 1) {
+        for (let page = 2; page <= totalPages; page++) {
+          const pageData = await callCurrentRMS(`opportunities?page=${page}&per_page=${perPage}`, 'GET');
+          allOpportunities = [...allOpportunities, ...(pageData.opportunities || [])];
+          setLoadingProgress({ current: page, total: totalPages });
+        }
+      }
+
+      console.log(`Loaded ${allOpportunities.length} total opportunities`);
+
       // Process opportunities
-      const processedOpps = opps.map(opp => ({
+      const processedOpps = allOpportunities.map(opp => ({
         ...opp,
         risk_score: Number(opp.risk_score) || 0,
         risk_mitigation_plan: Number(opp.risk_mitigation_plan) || 0,
@@ -122,16 +123,21 @@ export default function RiskManagementPortal() {
 
       setOpportunities(processedOpps);
       setLastRefresh(new Date());
+      setCurrentPage(1); // Reset to first page
       
     } catch (error) {
       console.error('Error fetching opportunities:', error);
       alert('Failed to load opportunities. Please check your API configuration.');
     } finally {
       setLoading(false);
+      setLoadingProgress({ current: 0, total: 0 });
     }
   };
 
-  // Filter opportunities based on date, review status, and mitigation plan
+  /**
+   * Filter opportunities based on all criteria
+   * Now works on ALL loaded opportunities, not just one page
+   */
   const getFilteredOpportunities = () => {
     const dateRange = getDateRange(dateFilter);
     
@@ -143,24 +149,11 @@ export default function RiskManagementPortal() {
         if (dateRange.end && oppDate > dateRange.end) return false;
       }
 
-      // ✅ FIXED: Handle Current RMS "Yes" format for reviewed status
-      // Current RMS returns "Yes" or "" (empty string), not boolean
+      // Reviewed status filtering
       const isReviewed = opp.risk_reviewed === 'Yes' || opp.risk_reviewed === true || 
                         opp.risk_reviewed === 'true' || opp.risk_reviewed === 1 || 
                         opp.risk_reviewed === '1';
       
-      // Debug logging (can be removed after verification)
-      if (showDebug) {
-        console.log('Filtering opportunity:', {
-          id: opp.id,
-          subject: opp.subject,
-          risk_reviewed_raw: opp.risk_reviewed,
-          isReviewed_calculated: isReviewed,
-          reviewedFilter: reviewedFilter
-        });
-      }
-
-      // Reviewed status filtering
       if (reviewedFilter === 'reviewed' && !isReviewed) return false;
       if (reviewedFilter === 'not_reviewed' && isReviewed) return false;
 
@@ -175,8 +168,18 @@ export default function RiskManagementPortal() {
     });
   };
 
+  /**
+   * Get paginated view of filtered opportunities
+   */
+  const getPaginatedOpportunities = () => {
+    const filtered = getFilteredOpportunities();
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filtered.slice(startIndex, endIndex);
+  };
+
   // Calculate statistics
-  const calculateStats = (opps = opportunities) => {
+  const calculateStats = () => {
     const filtered = getFilteredOpportunities();
     
     const criticalRisk = filtered.filter(o => o.risk_score > 4).length;
@@ -214,7 +217,7 @@ export default function RiskManagementPortal() {
 
   // Initial load
   useEffect(() => {
-    fetchOpportunities(1);
+    fetchOpportunities();
   }, []);
 
   // Reset to page 1 when filters change
@@ -329,6 +332,11 @@ export default function RiskManagementPortal() {
   };
 
   const Pagination = () => {
+    const filteredOpps = getFilteredOpportunities();
+    const totalPages = Math.ceil(filteredOpps.length / ITEMS_PER_PAGE);
+    
+    if (totalPages <= 1) return null;
+
     const maxButtons = 7;
     let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
     let endPage = Math.min(totalPages, startPage + maxButtons - 1);
@@ -344,16 +352,16 @@ export default function RiskManagementPortal() {
 
     const handlePageChange = (newPage) => {
       setCurrentPage(newPage);
-      fetchOpportunities(newPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    if (totalPages <= 1) return null;
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, filteredOpps.length);
 
     return (
       <div className="flex items-center justify-between mt-6 px-4">
         <div className="text-sm text-gray-600">
-          Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} of {totalCount} opportunities
+          Showing {startIndex} to {endIndex} of {filteredOpps.length} opportunities
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -415,6 +423,7 @@ export default function RiskManagementPortal() {
   };
 
   if (view === 'dashboard') {
+    const paginatedOpps = getPaginatedOpportunities();
     const filteredOpps = getFilteredOpportunities();
     
     return (
@@ -435,7 +444,7 @@ export default function RiskManagementPortal() {
                   </span>
                 )}
                 <button
-                  onClick={() => fetchOpportunities(currentPage)}
+                  onClick={fetchOpportunities}
                   disabled={loading}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
                 >
@@ -454,6 +463,26 @@ export default function RiskManagementPortal() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Loading Progress */}
+          {loading && loadingProgress.total > 0 && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-900">
+                  Loading opportunities...
+                </span>
+                <span className="text-sm text-blue-700">
+                  Page {loadingProgress.current} of {loadingProgress.total}
+                </span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(loadingProgress.current / loadingProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Filters */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
             <h3 className="font-semibold text-gray-900 mb-4">Filters</h3>
@@ -530,7 +559,6 @@ export default function RiskManagementPortal() {
 
             {/* Workflow Filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Reviewed Status Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Review Status</label>
                 <div className="flex gap-2">
@@ -561,7 +589,6 @@ export default function RiskManagementPortal() {
                 </div>
               </div>
 
-              {/* Mitigation Plan Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Mitigation Plan</label>
                 <div className="flex gap-2">
@@ -623,7 +650,6 @@ export default function RiskManagementPortal() {
               value={stats.criticalRisk}
               icon={AlertCircle}
               color="text-purple-500"
-              onClick={() => setSelectedCategory('critical')}
             />
             <StatCard 
               title="Needs Review" 
@@ -671,21 +697,15 @@ export default function RiskManagementPortal() {
               <div className="text-sm text-yellow-800 space-y-1">
                 <div>Version: {VERSION}</div>
                 <div>Total Opportunities Loaded: {opportunities.length}</div>
-                <div>Filtered Opportunities: {filteredOpps.length}</div>
-                <div>Current Page: {currentPage} of {totalPages}</div>
+                <div>After Filters Applied: {filteredOpps.length}</div>
+                <div>Currently Displaying: {paginatedOpps.length}</div>
+                <div>Current Page: {currentPage}</div>
                 <div>Review Filter: {reviewedFilter}</div>
                 <div>Mitigation Filter: {mitigationFilter}</div>
                 <div className="mt-2 pt-2 border-t border-yellow-300">
-                  <div className="font-semibold">Sample Data (first opportunity):</div>
-                  {opportunities.length > 0 && (
-                    <pre className="text-xs mt-1 overflow-auto">
-                      {JSON.stringify({
-                        risk_reviewed: opportunities[0].risk_reviewed,
-                        risk_score: opportunities[0].risk_score,
-                        risk_mitigation_plan: opportunities[0].risk_mitigation_plan
-                      }, null, 2)}
-                    </pre>
-                  )}
+                  <div className="font-semibold">Reviewed Status Breakdown:</div>
+                  <div>• Reviewed: {opportunities.filter(o => o.risk_reviewed === 'Yes').length}</div>
+                  <div>• Not Reviewed: {opportunities.filter(o => !o.risk_reviewed || o.risk_reviewed === '').length}</div>
                 </div>
               </div>
             </div>
@@ -695,7 +715,7 @@ export default function RiskManagementPortal() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
-                Opportunities ({filteredOpps.length})
+                Opportunities ({filteredOpps.length} matching filters)
               </h2>
             </div>
             
@@ -704,15 +724,18 @@ export default function RiskManagementPortal() {
                 <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
                 <p className="text-gray-600">Loading opportunities...</p>
               </div>
-            ) : filteredOpps.length === 0 ? (
+            ) : paginatedOpps.length === 0 ? (
               <div className="p-12 text-center">
                 <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                 <p className="text-gray-600">No opportunities match the current filters</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Total loaded: {opportunities.length} | After filters: {filteredOpps.length}
+                </p>
               </div>
             ) : (
               <div className="p-6">
                 <div className="space-y-4">
-                  {filteredOpps.map(opp => (
+                  {paginatedOpps.map(opp => (
                     <OpportunityCard key={opp.id} opp={opp} />
                   ))}
                 </div>
@@ -735,7 +758,6 @@ export default function RiskManagementPortal() {
         }}
         onSave={async (updatedData) => {
           try {
-            // ✅ FIXED: Use "Yes"/"" format for Current RMS
             const payload = {
               opportunity: {
                 risk_score: updatedData.score,
@@ -748,7 +770,7 @@ export default function RiskManagementPortal() {
             await callCurrentRMS(`opportunities/${selectedOpp.id}`, 'PATCH', payload);
             
             // Refresh data
-            await fetchOpportunities(currentPage);
+            await fetchOpportunities();
             setView('dashboard');
             setSelectedOpp(null);
           } catch (error) {
@@ -779,11 +801,9 @@ function RiskAssessment({ opportunity, onBack, onSave, callCurrentRMS }) {
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Initialize from existing score
   useEffect(() => {
     if (opportunity?.risk_score) {
       const score = opportunity.risk_score;
-      // Estimate impact and likelihood from score (assuming they were roughly equal)
       const estimated = Math.sqrt(score);
       setImpact(Math.round(estimated));
       setLikelihood(Math.round(estimated));
@@ -853,7 +873,6 @@ function RiskAssessment({ opportunity, onBack, onSave, callCurrentRMS }) {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
           <h2 className="font-semibold text-gray-900 mb-4">Risk Assessment Matrix</h2>
           
-          {/* Impact Scale */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Impact (1-5)
@@ -878,7 +897,6 @@ function RiskAssessment({ opportunity, onBack, onSave, callCurrentRMS }) {
             </p>
           </div>
 
-          {/* Likelihood Scale */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Likelihood (1-5)
@@ -903,7 +921,6 @@ function RiskAssessment({ opportunity, onBack, onSave, callCurrentRMS }) {
             </p>
           </div>
 
-          {/* Calculated Risk Score */}
           <div className="bg-gray-50 p-4 rounded-md">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">Calculated Risk Score:</span>
