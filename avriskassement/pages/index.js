@@ -455,7 +455,7 @@ export default function RiskManagementPortal() {
                 <button
                   onClick={() => handleDateFilterChange('30')}
                   className={`px-4 py-2 rounded-md font-medium ${
-                    dateFilter === '0'
+                    dateFilter === '30'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
@@ -465,7 +465,7 @@ export default function RiskManagementPortal() {
                 <button
                   onClick={() => handleDateFilterChange('60')}
                   className={`px-4 py-2 rounded-md font-medium ${
-                    dateFilter === '30'
+                    dateFilter === '60'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
@@ -475,7 +475,7 @@ export default function RiskManagementPortal() {
                 <button
                   onClick={() => handleDateFilterChange('90')}
                   className={`px-4 py-2 rounded-md font-medium ${
-                    dateFilter === '60'
+                    dateFilter === '90'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
