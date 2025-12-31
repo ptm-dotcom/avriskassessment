@@ -79,8 +79,9 @@ export default function RiskManagementPortal() {
       // Always use server-side API (no config check needed)
       // Calculate date range for API filtering
       const { start, end } = getDateRange();
-      const startDate = start.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-      const endDate = end.toISOString().split('T')[0];
+      // Format dates in local timezone (not UTC) to avoid timezone shift issues
+      const startDate = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
+      const endDate = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
       
       console.log(`Fetching opportunities from ${startDate} to ${endDate}`);
       console.log('Fetching from Current RMS API with pagination and date filtering...');
