@@ -1,7 +1,3 @@
-
-// API Route: /api/current-rms
-// This proxies requests to Current RMS API with server-side credentials
-
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
