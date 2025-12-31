@@ -700,6 +700,7 @@ export default function RiskManagementPortal() {
                 </div>
               </div>
             </div>
+            </div>
             
             <div className="flex items-center justify-between mt-2">
               <div className="text-sm text-gray-500">
