@@ -296,7 +296,7 @@ export default function RiskManagementPortal() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
-                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.1</span>
+                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">v2.2-debug</span>
               </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
@@ -438,17 +438,25 @@ export default function RiskManagementPortal() {
               Total loaded from API: {opportunities.length} | After date filter: {filteredOpportunities.length}
             </p>
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {opportunities.map(opp => (
-                <div key={opp.id} className="bg-white p-3 rounded border border-gray-200 text-sm">
-                  <div className="font-semibold">#{opp.id} - {opp.name}</div>
-                  <div className="text-gray-600">
-                    Start: {opp.starts_at} | 
-                    Value: ${(opp.value / 1000).toFixed(1)}k | 
-                    Risk Score: {opp.risk_score || 'none'} | 
-                    Risk Level: {opp.risk_level || 'none'}
+              {opportunities.map(opp => {
+                // Calculate what the risk level SHOULD be
+                const calculatedLevel = opp.risk_score > 0 
+                  ? (opp.risk_score <= 2.0 ? 'LOW' : opp.risk_score <= 3.0 ? 'MEDIUM' : opp.risk_score <= 4.0 ? 'HIGH' : 'CRITICAL')
+                  : 'none';
+                
+                return (
+                  <div key={opp.id} className="bg-white p-3 rounded border border-gray-200 text-sm">
+                    <div className="font-semibold">#{opp.id} - {opp.name}</div>
+                    <div className="text-gray-600">
+                      Start: {opp.starts_at} | 
+                      Value: ${(opp.value / 1000).toFixed(1)}k | 
+                      Risk Score: {opp.risk_score || 'none'} | 
+                      Risk Level (stored): {opp.risk_level || 'none'} |
+                      Risk Level (calculated): {calculatedLevel}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
