@@ -13,6 +13,9 @@ export default function RiskManagementPortal() {
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDebug, setShowDebug] = useState(false);
+  // Workflow filters
+  const [reviewedFilter, setReviewedFilter] = useState('all'); // 'all', 'reviewed', 'not_reviewed'
+  const [mitigationFilter, setMitigationFilter] = useState('all'); // 'all', 'none', 'partial', 'complete', 'incomplete'
   const [apiConfig, setApiConfig] = useState({
     subdomain: '',
     authToken: '',
@@ -21,16 +24,16 @@ export default function RiskManagementPortal() {
 
   // Mock data for demonstration
   const mockOpportunities = [
-    { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL', risk_project_novelty: 4, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 4, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 3 },
-    { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM', risk_project_novelty: 2, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 2, risk_subhire_availability: 2 },
-    { id: 1003, name: 'Product Launch - Stadium Event', subject: 'Product Launch', value: 95000, estimated_cost: 68000, owner: 'Sarah M.', starts_at: '2026-03-10', contact_name: 'Mike Chen', risk_score: 4.8, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 5, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 5 },
-    { id: 1004, name: 'Corporate Training Day', subject: 'Corporate', value: 3200, estimated_cost: 1800, owner: 'John D.', starts_at: '2026-01-25', contact_name: 'Emma Wilson', risk_score: 1.5, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 1, risk_resource_utilization: 1, risk_client_sophistication: 2, risk_budget_size: 1, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 1 },
-    { id: 1005, name: 'Music Festival Main Stage', subject: 'Festival', value: 125000, estimated_cost: 89000, owner: 'Sarah M.', starts_at: '2026-04-05', contact_name: 'David Lee', risk_score: 3.8, risk_level: 'HIGH', risk_project_novelty: 4, risk_technical_complexity: 4, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 3, risk_subhire_availability: 3 },
-    { id: 1006, name: 'AGM - Convention Center', subject: 'AGM', value: 12000, estimated_cost: 7500, owner: 'Mike T.', starts_at: '2026-02-01', contact_name: 'Lisa Brown', risk_score: 1.8, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 2, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 2 },
-    { id: 1007, name: 'Trade Show Booth', subject: 'Trade Show', value: 6500, estimated_cost: 4200, owner: 'John D.', starts_at: '2026-01-30', contact_name: 'Tom Anderson', risk_score: 2.8, risk_level: 'MEDIUM', risk_project_novelty: 3, risk_technical_complexity: 3, risk_resource_utilization: 3, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 3, risk_team_experience: 2, risk_subhire_availability: 3 },
-    { id: 1008, name: 'Live Broadcast - Sports Arena', subject: 'Broadcast', value: 78000, estimated_cost: 55000, owner: 'Sarah M.', starts_at: '2026-02-20', contact_name: 'Rachel Green', risk_score: 4.5, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 4, risk_subhire_availability: 4 },
-    { id: 1009, name: 'New Client Consultation', subject: 'Consultation', value: 15000, estimated_cost: 9000, owner: 'John D.', starts_at: '2026-01-28', contact_name: 'Peter Wang', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0 },
-    { id: 1010, name: 'Charity Gala Evening', subject: 'Gala', value: 22000, estimated_cost: 14000, owner: 'Mike T.', starts_at: '2026-02-10', contact_name: 'Jane Smith', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0 }
+    { id: 1001, name: 'Corporate Event - Tech Summit 2026', subject: 'Conference AV', value: 45000, estimated_cost: 32000, owner: 'Sarah M.', starts_at: '2026-02-15', contact_name: 'John Smith', risk_score: 4.2, risk_level: 'CRITICAL', risk_project_novelty: 4, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 4, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 3, risk_reviewed: true, risk_mitigation_plan: 1 },
+    { id: 1002, name: 'Wedding Reception - Grand Hotel', subject: 'Wedding', value: 8500, estimated_cost: 5200, owner: 'Mike T.', starts_at: '2026-01-20', contact_name: 'Sarah Johnson', risk_score: 2.1, risk_level: 'MEDIUM', risk_project_novelty: 2, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 2, risk_subhire_availability: 2, risk_reviewed: true, risk_mitigation_plan: 2 },
+    { id: 1003, name: 'Product Launch - Stadium Event', subject: 'Product Launch', value: 95000, estimated_cost: 68000, owner: 'Sarah M.', starts_at: '2026-03-10', contact_name: 'Mike Chen', risk_score: 4.8, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 5, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 5, risk_team_experience: 4, risk_subhire_availability: 5, risk_reviewed: true, risk_mitigation_plan: 0 },
+    { id: 1004, name: 'Corporate Training Day', subject: 'Corporate', value: 3200, estimated_cost: 1800, owner: 'John D.', starts_at: '2026-01-25', contact_name: 'Emma Wilson', risk_score: 1.5, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 1, risk_resource_utilization: 1, risk_client_sophistication: 2, risk_budget_size: 1, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 1, risk_reviewed: true, risk_mitigation_plan: 2 },
+    { id: 1005, name: 'Music Festival Main Stage', subject: 'Festival', value: 125000, estimated_cost: 89000, owner: 'Sarah M.', starts_at: '2026-04-05', contact_name: 'David Lee', risk_score: 3.8, risk_level: 'HIGH', risk_project_novelty: 4, risk_technical_complexity: 4, risk_resource_utilization: 4, risk_client_sophistication: 3, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 3, risk_subhire_availability: 3, risk_reviewed: false, risk_mitigation_plan: 0 },
+    { id: 1006, name: 'AGM - Convention Center', subject: 'AGM', value: 12000, estimated_cost: 7500, owner: 'Mike T.', starts_at: '2026-02-01', contact_name: 'Lisa Brown', risk_score: 1.8, risk_level: 'LOW', risk_project_novelty: 1, risk_technical_complexity: 2, risk_resource_utilization: 2, risk_client_sophistication: 2, risk_budget_size: 2, risk_timeframe_constraint: 2, risk_team_experience: 1, risk_subhire_availability: 2, risk_reviewed: true, risk_mitigation_plan: 2 },
+    { id: 1007, name: 'Trade Show Booth', subject: 'Trade Show', value: 6500, estimated_cost: 4200, owner: 'John D.', starts_at: '2026-01-30', contact_name: 'Tom Anderson', risk_score: 2.8, risk_level: 'MEDIUM', risk_project_novelty: 3, risk_technical_complexity: 3, risk_resource_utilization: 3, risk_client_sophistication: 3, risk_budget_size: 2, risk_timeframe_constraint: 3, risk_team_experience: 2, risk_subhire_availability: 3, risk_reviewed: false, risk_mitigation_plan: 0 },
+    { id: 1008, name: 'Live Broadcast - Sports Arena', subject: 'Broadcast', value: 78000, estimated_cost: 55000, owner: 'Sarah M.', starts_at: '2026-02-20', contact_name: 'Rachel Green', risk_score: 4.5, risk_level: 'CRITICAL', risk_project_novelty: 5, risk_technical_complexity: 5, risk_resource_utilization: 4, risk_client_sophistication: 4, risk_budget_size: 5, risk_timeframe_constraint: 4, risk_team_experience: 4, risk_subhire_availability: 4, risk_reviewed: true, risk_mitigation_plan: 1 },
+    { id: 1009, name: 'New Client Consultation', subject: 'Consultation', value: 15000, estimated_cost: 9000, owner: 'John D.', starts_at: '2026-01-28', contact_name: 'Peter Wang', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0, risk_reviewed: false, risk_mitigation_plan: 0 },
+    { id: 1010, name: 'Charity Gala Evening', subject: 'Gala', value: 22000, estimated_cost: 14000, owner: 'Mike T.', starts_at: '2026-02-10', contact_name: 'Jane Smith', risk_score: 0, risk_level: null, risk_project_novelty: 0, risk_technical_complexity: 0, risk_resource_utilization: 0, risk_client_sophistication: 0, risk_budget_size: 0, risk_timeframe_constraint: 0, risk_team_experience: 0, risk_subhire_availability: 0, risk_reviewed: false, risk_mitigation_plan: 0 }
   ];
 
   useEffect(() => {
@@ -189,7 +192,10 @@ export default function RiskManagementPortal() {
           risk_budget_size: parseInt(opp.custom_fields?.risk_budget_size || 0),
           risk_timeframe_constraint: parseInt(opp.custom_fields?.risk_timeframe_constraint || 0),
           risk_team_experience: parseInt(opp.custom_fields?.risk_team_experience || 0),
-          risk_subhire_availability: parseInt(opp.custom_fields?.risk_subhire_availability || 0)
+          risk_subhire_availability: parseInt(opp.custom_fields?.risk_subhire_availability || 0),
+          // Workflow tracking
+          risk_reviewed: opp.custom_fields?.risk_reviewed === 'true' || opp.custom_fields?.risk_reviewed === true,
+          risk_mitigation_plan: parseInt(opp.custom_fields?.risk_mitigation_plan || 0) // 0=none, 1=partial, 2=complete
         }));
         
         console.log('Transformed opportunities:', transformedOpps.length);
@@ -307,7 +313,8 @@ export default function RiskManagementPortal() {
     return { start: today, end };
   };
   
-  // No need for client-side filtering anymore - the API returns pre-filtered data
+  // No need for client-side date filtering anymore - the API returns pre-filtered data by date
+  // But we still apply workflow filters client-side
   const oppsWithCalculatedLevels = opportunities.map(opp => {
     let calculatedLevel = null;
     if (opp.risk_score > 0) {
@@ -319,15 +326,30 @@ export default function RiskManagementPortal() {
     return { ...opp, risk_level: calculatedLevel };
   });
 
+  // Apply workflow filters
+  const workflowFilteredOpps = oppsWithCalculatedLevels.filter(opp => {
+    // Review filter
+    if (reviewedFilter === 'reviewed' && !opp.risk_reviewed) return false;
+    if (reviewedFilter === 'not_reviewed' && opp.risk_reviewed) return false;
+    
+    // Mitigation plan filter
+    if (mitigationFilter === 'none' && opp.risk_mitigation_plan !== 0) return false;
+    if (mitigationFilter === 'partial' && opp.risk_mitigation_plan !== 1) return false;
+    if (mitigationFilter === 'complete' && opp.risk_mitigation_plan !== 2) return false;
+    if (mitigationFilter === 'incomplete' && opp.risk_mitigation_plan === 2) return false; // 0 or 1 only
+    
+    return true;
+  });
+
   const filteredCategorizedOpps = {
-    CRITICAL: oppsWithCalculatedLevels.filter(o => o.risk_level === 'CRITICAL'),
-    HIGH: oppsWithCalculatedLevels.filter(o => o.risk_level === 'HIGH'),
-    MEDIUM: oppsWithCalculatedLevels.filter(o => o.risk_level === 'MEDIUM'),
-    LOW: oppsWithCalculatedLevels.filter(o => o.risk_level === 'LOW'),
-    UNSCORED: oppsWithCalculatedLevels.filter(o => !o.risk_level || o.risk_score === 0)
+    CRITICAL: workflowFilteredOpps.filter(o => o.risk_level === 'CRITICAL'),
+    HIGH: workflowFilteredOpps.filter(o => o.risk_level === 'HIGH'),
+    MEDIUM: workflowFilteredOpps.filter(o => o.risk_level === 'MEDIUM'),
+    LOW: workflowFilteredOpps.filter(o => o.risk_level === 'LOW'),
+    UNSCORED: workflowFilteredOpps.filter(o => !o.risk_level || o.risk_score === 0)
   };
 
-  const filteredTotalValue = oppsWithCalculatedLevels.reduce((sum, opp) => sum + (opp.value || 0), 0);
+  const filteredTotalValue = workflowFilteredOpps.reduce((sum, opp) => sum + (opp.value || 0), 0);
   const filteredHighRiskValue = [...filteredCategorizedOpps.CRITICAL, ...filteredCategorizedOpps.HIGH].reduce((sum, opp) => sum + (opp.value || 0), 0);
 
   if (!apiConfig.configured && view === 'dashboard') {
@@ -558,10 +580,109 @@ export default function RiskManagementPortal() {
                 </div>
               )}
             </div>
+
+            {/* Workflow Filters */}
+            <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Review Status
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setReviewedFilter('all')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      reviewedFilter === 'all'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setReviewedFilter('reviewed')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      reviewedFilter === 'reviewed'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Reviewed
+                  </button>
+                  <button
+                    onClick={() => setReviewedFilter('not_reviewed')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      reviewedFilter === 'not_reviewed'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Not Reviewed
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mitigation Plan
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setMitigationFilter('all')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      mitigationFilter === 'all'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setMitigationFilter('none')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      mitigationFilter === 'none'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    None
+                  </button>
+                  <button
+                    onClick={() => setMitigationFilter('partial')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      mitigationFilter === 'partial'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Partial
+                  </button>
+                  <button
+                    onClick={() => setMitigationFilter('complete')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      mitigationFilter === 'complete'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Complete
+                  </button>
+                  <button
+                    onClick={() => setMitigationFilter('incomplete')}
+                    className={`px-3 py-1.5 text-sm rounded-md font-medium ${
+                      mitigationFilter === 'incomplete'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Incomplete
+                  </button>
+                </div>
+              </div>
+            </div>
             
             <div className="flex items-center justify-between mt-2">
               <p className="text-sm text-gray-500">
-                Showing {oppsWithCalculatedLevels.length} opportunities
+                Showing {workflowFilteredOpps.length} opportunities
               </p>
               {lastRefresh && (
                 <p className="text-sm text-gray-500">
@@ -800,6 +921,8 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
     teamExperience: opp.risk_team_experience || 3,
     equipmentAvailability: opp.risk_subhire_availability || 3
   });
+  const [reviewed, setReviewed] = useState(opp.risk_reviewed || false);
+  const [mitigationPlan, setMitigationPlan] = useState(opp.risk_mitigation_plan || 0);
 
   const factors = [
     {
@@ -965,7 +1088,9 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
                 risk_budget_size: scores.budgetSize,
                 risk_timeframe_constraint: scores.timeframeConstraint,
                 risk_team_experience: scores.teamExperience,
-                risk_subhire_availability: scores.equipmentAvailability
+                risk_subhire_availability: scores.equipmentAvailability,
+                risk_reviewed: reviewed,
+                risk_mitigation_plan: mitigationPlan
               }
             }
           })
@@ -1048,6 +1173,58 @@ function RiskAssessment({ opp, apiConfig, onBack }) {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Workflow Status Controls */}
+          <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reviewed}
+                  onChange={(e) => setReviewed(e.target.checked)}
+                  className="w-5 h-5 text-blue-600 rounded"
+                />
+                <span className="font-semibold text-gray-800">Mark as Reviewed</span>
+              </label>
+              <p className="text-xs text-gray-600 ml-7">Check this when risk assessment is reviewed</p>
+            </div>
+            
+            <div>
+              <label className="block font-semibold text-gray-800 mb-2">Mitigation Plan Status</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setMitigationPlan(0)}
+                  className={`flex-1 px-3 py-2 text-sm rounded transition-all ${
+                    mitigationPlan === 0
+                      ? 'bg-red-600 text-white font-semibold'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                  }`}
+                >
+                  None
+                </button>
+                <button
+                  onClick={() => setMitigationPlan(1)}
+                  className={`flex-1 px-3 py-2 text-sm rounded transition-all ${
+                    mitigationPlan === 1
+                      ? 'bg-yellow-600 text-white font-semibold'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                  }`}
+                >
+                  Partial
+                </button>
+                <button
+                  onClick={() => setMitigationPlan(2)}
+                  className={`flex-1 px-3 py-2 text-sm rounded transition-all ${
+                    mitigationPlan === 2
+                      ? 'bg-green-600 text-white font-semibold'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                  }`}
+                >
+                  Complete
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Action buttons */}
