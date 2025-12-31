@@ -330,15 +330,17 @@ export default function RiskManagementPortal() {
 
   // Apply workflow filters
   const workflowFilteredOpps = oppsWithCalculatedLevels.filter(opp => {
-    // Review filter
-    if (reviewedFilter === 'reviewed' && !opp.risk_reviewed) return false;
-    if (reviewedFilter === 'not_reviewed' && opp.risk_reviewed) return false;
+    // Review filter - handle both boolean and string values
+    const isReviewed = opp.risk_reviewed === true || opp.risk_reviewed === 'true';
+    if (reviewedFilter === 'reviewed' && !isReviewed) return false;
+    if (reviewedFilter === 'not_reviewed' && isReviewed) return false;
     
-    // Mitigation plan filter
-    if (mitigationFilter === 'none' && opp.risk_mitigation_plan !== 0) return false;
-    if (mitigationFilter === 'partial' && opp.risk_mitigation_plan !== 1) return false;
-    if (mitigationFilter === 'complete' && opp.risk_mitigation_plan !== 2) return false;
-    if (mitigationFilter === 'incomplete' && opp.risk_mitigation_plan === 2) return false; // 0 or 1 only
+    // Mitigation plan filter - ensure it's a number
+    const planStatus = parseInt(opp.risk_mitigation_plan) || 0;
+    if (mitigationFilter === 'none' && planStatus !== 0) return false;
+    if (mitigationFilter === 'partial' && planStatus !== 1) return false;
+    if (mitigationFilter === 'complete' && planStatus !== 2) return false;
+    if (mitigationFilter === 'incomplete' && planStatus === 2) return false; // 0 or 1 only
     
     return true;
   });
@@ -584,7 +586,24 @@ export default function RiskManagementPortal() {
             </div>
 
             {/* Workflow Filters */}
-            <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Workflow Filters
+                </label>
+                {(reviewedFilter !== 'all' || mitigationFilter !== 'all') && (
+                  <button
+                    onClick={() => {
+                      setReviewedFilter('all');
+                      setMitigationFilter('all');
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Review Status
@@ -683,9 +702,18 @@ export default function RiskManagementPortal() {
             </div>
             
             <div className="flex items-center justify-between mt-2">
-              <p className="text-sm text-gray-500">
-                Showing {workflowFilteredOpps.length} opportunities
-              </p>
+              <div className="text-sm text-gray-500">
+                Showing <span className="font-semibold text-gray-700">{workflowFilteredOpps.length}</span> of <span className="font-semibold text-gray-700">{opportunities.length}</span> opportunities
+                {(reviewedFilter !== 'all' || mitigationFilter !== 'all') && (
+                  <span className="ml-2 text-xs">
+                    (
+                    {reviewedFilter !== 'all' && <span className="text-blue-600 font-medium">{reviewedFilter === 'reviewed' ? 'Reviewed' : 'Not Reviewed'}</span>}
+                    {reviewedFilter !== 'all' && mitigationFilter !== 'all' && ' + '}
+                    {mitigationFilter !== 'all' && <span className="text-blue-600 font-medium">Plan: {mitigationFilter.charAt(0).toUpperCase() + mitigationFilter.slice(1)}</span>}
+                    )
+                  </span>
+                )}
+              </div>
               {lastRefresh && (
                 <p className="text-sm text-gray-500">
                   Last updated: {lastRefresh.toLocaleString()}
