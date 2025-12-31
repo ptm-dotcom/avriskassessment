@@ -75,7 +75,11 @@ export default function RiskManagementPortal() {
           console.log(`Fetching page ${currentPage}/${totalPages || '?'}...`);
           setLoadingProgress({ current: currentPage, total: totalPages });
           
+          // Current RMS API might use different parameter names
+          // Try: per_page=100 (most common) or limit=100 or page_size=100
           const url = `https://api.current-rms.com/api/v1/opportunities?page=${currentPage}&per_page=100`;
+          
+          console.log('Fetching URL:', url);
           
           const response = await fetch(url, {
             method: 'GET',
@@ -96,7 +100,11 @@ export default function RiskManagementPortal() {
           }
           
           const data = await response.json();
-          console.log(`Page ${currentPage} data:`, data);
+          
+          // DETAILED LOGGING FOR DEBUGGING
+          console.log('=== FULL API RESPONSE ===');
+          console.log('Response keys:', Object.keys(data));
+          console.log('Full response:', JSON.stringify(data, null, 2));
           
           // Check if data has opportunities array
           if (!data.opportunities || !Array.isArray(data.opportunities)) {
@@ -108,15 +116,51 @@ export default function RiskManagementPortal() {
           allOpportunities.push(...data.opportunities);
           console.log(`Added ${data.opportunities.length} opportunities from page ${currentPage}. Total so far: ${allOpportunities.length}`);
           
-          // Check pagination metadata
-          // Current RMS typically returns pagination info in the meta field
-          if (data.meta && data.meta.total_pages) {
-            totalPages = data.meta.total_pages;
-            console.log(`Total pages from meta: ${totalPages}`);
-          } else if (data.opportunities.length === 0 || data.opportunities.length < 100) {
-            // If we got fewer than 100 results, we're likely on the last page
-            console.log('Reached last page (fewer than 100 results)');
-            break;
+          // DETAILED PAGINATION METADATA LOGGING
+          console.log('=== PAGINATION INFO ===');
+          console.log('data.meta:', data.meta);
+          console.log('data.pagination:', data.pagination);
+          console.log('Response headers would contain Link header (not accessible in browser)');
+          
+          // Check pagination metadata - try different possible fields
+          if (data.meta) {
+            console.log('meta.total_pages:', data.meta.total_pages);
+            console.log('meta.total_count:', data.meta.total_count);
+            console.log('meta.page:', data.meta.page);
+            console.log('meta.per_page:', data.meta.per_page);
+            
+            if (data.meta.total_pages) {
+              totalPages = data.meta.total_pages;
+              console.log(`✓ Found total pages in meta: ${totalPages}`);
+            }
+          }
+          
+          if (data.pagination) {
+            console.log('pagination.total_pages:', data.pagination.total_pages);
+            console.log('pagination.total:', data.pagination.total);
+            console.log('pagination.current_page:', data.pagination.current_page);
+            console.log('pagination.per_page:', data.pagination.per_page);
+            
+            if (data.pagination.total_pages) {
+              totalPages = data.pagination.total_pages;
+              console.log(`✓ Found total pages in pagination: ${totalPages}`);
+            }
+          }
+          
+          // If no pagination metadata found, check if this is the last page
+          if (totalPages === 1) {
+            const perPage = data.meta?.per_page || data.pagination?.per_page || 100;
+            console.log(`Per page setting: ${perPage}`);
+            
+            if (data.opportunities.length < perPage) {
+              console.log(`Reached last page (got ${data.opportunities.length} < ${perPage} results)`);
+              break;
+            } else if (data.opportunities.length === 0) {
+              console.log('Reached last page (0 results)');
+              break;
+            } else {
+              console.log(`Got ${data.opportunities.length} results, continuing to next page...`);
+            }
           }
           
           currentPage++;
