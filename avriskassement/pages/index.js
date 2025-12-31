@@ -66,6 +66,15 @@ export default function RiskManagementPortal() {
     loadOpportunities();
   }, []);
 
+  // Auto-refresh data when date filters change
+  useEffect(() => {
+    // Skip the initial mount (handled by the effect above)
+    // Only reload when dateFilter, customStartDate, or customEndDate changes
+    if (opportunities.length > 0) {
+      loadOpportunities();
+    }
+  }, [dateFilter, customStartDate, customEndDate]);
+
   // Removed saveApiConfig - using server-side credentials
 
   /**
@@ -214,14 +223,14 @@ export default function RiskManagementPortal() {
 
   const handleDateFilterChange = (newFilter) => {
     setDateFilter(newFilter);
-    // Reload opportunities with new date filter
-    loadOpportunities();
+    // Data will auto-refresh via useEffect watching dateFilter
   };
 
   const handleCustomDateChange = () => {
-    // Reload opportunities when custom dates are applied
-    if (customStartDate && customEndDate) {
-      loadOpportunities();
+    // Data will auto-refresh via useEffect watching customStartDate/customEndDate
+    // Just validate that dates are set
+    if (!customStartDate || !customEndDate) {
+      alert('Please select both start and end dates');
     }
   };
 
@@ -395,7 +404,7 @@ export default function RiskManagementPortal() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-800">Risk Management Portal</h1>
-                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded font-semibold">v3.5</span>
+                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded font-semibold">v3.0.3-FIXED</span>
               </div>
               <p className="text-gray-600 mb-4">Current RMS Opportunities by Risk Level</p>
               
